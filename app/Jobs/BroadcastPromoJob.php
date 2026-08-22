@@ -39,7 +39,7 @@ class BroadcastPromoJob implements ShouldQueue
             $message = CloudMessage::new()
                 ->withTopic('promo_broadcast')
                 ->withNotification(Notification::create('Ada Promo Baru: ' . $this->campaign->name, $messageBody))
-                ->withData(['campaign_id' => $this->campaign->id, 'action' => 'open_promo']);
+                ->withData(['campaign_id' => (string) $this->campaign->id, 'action' => 'open_promo']);
             
             $result = $messaging->send($message);
             // KITA NGE-CHEAT BUAT NGETES: LANGSUNG TAMPILIN DI LAYAR
