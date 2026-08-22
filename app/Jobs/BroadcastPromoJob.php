@@ -41,9 +41,10 @@ class BroadcastPromoJob implements ShouldQueue
                 ->withData(['campaign_id' => $this->campaign->id, 'action' => 'open_promo']);
             
             $result = $messaging->send($message);
-            Log::info('FCM Broadcast Berhasil Dikirim! Target Topic: promo_broadcast', (array) $result);
+            // KITA NGE-CHEAT BUAT NGETES: LANGSUNG TAMPILIN DI LAYAR
+            dd('🔥 YESS FCM BERHASIL DIKIRIM! INI BUKTINYA:', $result);
         } catch (\Exception $e) {
-            Log::error('FCM Broadcast Job Error: ' . $e->getMessage());
+            dd('❌ YAH GAGAL KIRIM FCM. ERRORNYA:', $e->getMessage());
         }
     }
 }
