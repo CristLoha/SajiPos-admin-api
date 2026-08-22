@@ -80,45 +80,81 @@
         }
         .sidebar h3 {
             margin-top: 0;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
+            font-weight: 700;
             color: var(--text-muted);
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
         .sidebar ul {
             list-style: none;
             padding: 0;
             margin: 0;
         }
-        .sidebar li {
+        
+        .toc-group {
             margin-bottom: 0.5rem;
         }
         .sidebar li.toc-h2 {
-            margin-top: 1.25rem;
             font-weight: 600;
             color: var(--text-main);
+            font-size: 0.95rem;
+            cursor: pointer;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
         }
+        .sidebar li.toc-h2:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+        .sidebar li.toc-h2::after {
+            content: '▾';
+            color: #94a3b8;
+            font-size: 0.8rem;
+            transition: transform 0.2s;
+        }
+        .sidebar li.toc-h2.collapsed::after {
+            transform: rotate(-90deg);
+        }
+        
+        .toc-sublist {
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+            max-height: 1000px; /* sufficiently large */
+            opacity: 1;
+            margin-left: 1rem !important;
+            border-left: 1px solid var(--border-color);
+        }
+        .toc-sublist.collapsed {
+            max-height: 0;
+            opacity: 0;
+        }
+        
         .sidebar li.toc-h3 {
-            padding-left: 1rem;
-            font-size: 0.9rem;
-            position: relative;
+            font-size: 0.85rem;
+            margin: 0 !important;
         }
-        .sidebar li.toc-h3::before {
-            content: "•";
-            position: absolute;
-            left: 0;
-            color: #cbd5e1;
-        }
-        .sidebar a {
+        .sidebar li.toc-h3 a {
             text-decoration: none;
             color: var(--text-muted);
             display: block;
+            padding: 0.4rem 0.75rem;
             line-height: 1.4;
-            transition: color 0.2s;
+            transition: all 0.2s;
+            border-left: 2px solid transparent;
+            margin-left: -1px;
         }
-        .sidebar a:hover {
+        .sidebar li.toc-h3 a:hover {
             color: var(--primary);
+            background: #f8fafc;
+            border-left-color: var(--primary);
+            border-radius: 0 6px 6px 0;
         }
 
         /* Main Content area */
@@ -342,38 +378,62 @@
             const headings = md.querySelectorAll('h2, h3');
             const toc = document.getElementById('toc');
             
-            // Generate TOC
+            // Generate TOC (Accordion Style)
+            let currentGroup = null;
+            let currentSubList = null;
+            
             headings.forEach(h => {
                 if(h.tagName === 'H2' && h.textContent.includes('Dokumentasi API')) return;
                 
                 if(!h.id) h.id = h.textContent.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
                 
-                const li = document.createElement('li');
-                li.className = 'toc-' + h.tagName.toLowerCase();
-                
-                const a = document.createElement('a');
-                a.href = '#' + h.id;
-                
-                // Hapus emoji di depan teks untuk TOC agar lebih rapi
                 let text = h.textContent;
                 text = text.replace(/[\u{1F300}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').trim();
-                
-                // Hapus penomoran bab (seperti "0. ", "1. ", "A. ", "B. ") biar bersih
                 text = text.replace(/^[0-9A-Z]+\.\s*/i, '').trim();
-                
-                a.textContent = text;
-                
-                li.appendChild(a);
-                toc.appendChild(li);
-                
-                a.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const target = document.getElementById(h.id);
-                    window.scrollTo({
-                        top: target.getBoundingClientRect().top + window.scrollY - 90,
-                        behavior: 'smooth'
+
+                if (h.tagName === 'H2') {
+                    // Buat container grup untuk H2 dan H3 di bawahnya
+                    currentGroup = document.createElement('div');
+                    currentGroup.className = 'toc-group';
+                    
+                    const h2Li = document.createElement('li');
+                    h2Li.className = 'toc-h2';
+                    h2Li.textContent = text;
+                    
+                    // Container untuk H3 (Bisa di-collapse)
+                    currentSubList = document.createElement('ul');
+                    currentSubList.className = 'toc-sublist collapsed'; // Default disembunyikan
+                    h2Li.classList.add('collapsed');
+                    
+                    // Fitur Accordion Toggle
+                    h2Li.addEventListener('click', () => {
+                        h2Li.classList.toggle('collapsed');
+                        currentSubList.classList.toggle('collapsed');
                     });
-                });
+                    
+                    currentGroup.appendChild(h2Li);
+                    currentGroup.appendChild(currentSubList);
+                    toc.appendChild(currentGroup);
+                    
+                } else if (h.tagName === 'H3' && currentSubList) {
+                    const li = document.createElement('li');
+                    li.className = 'toc-h3';
+                    const a = document.createElement('a');
+                    a.href = '#' + h.id;
+                    a.textContent = text;
+                    
+                    li.appendChild(a);
+                    currentSubList.appendChild(li);
+                    
+                    a.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const target = document.getElementById(h.id);
+                        window.scrollTo({
+                            top: target.getBoundingClientRect().top + window.scrollY - 90,
+                            behavior: 'smooth'
+                        });
+                    });
+                }
             });
 
             // Percantik Tampilan Endpoint (Badges & API Info Card)
