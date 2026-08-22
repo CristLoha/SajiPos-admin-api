@@ -15,46 +15,35 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Admin user
+        // ==========================================
+        // AKUN ADMIN UTAMA (Ganti password setelah login!)
+        // ==========================================
         User::factory()->create([
-            'name' => 'Admin SajiPOS',
+            'name' => 'Super Admin',
             'email' => 'admin@sajipos.com',
             'username' => 'admin',
-            'password' => bcrypt('password123'),
+            'password' => bcrypt('admin12345'), // Pastikan diubah nanti!
             'roles' => 'admin',
         ]);
 
-        // Staff user
+        // Akun Staff (Kasir)
         User::factory()->create([
-            'name' => 'Staff SajiPOS',
-            'email' => 'staff@sajipos.com',
-            'username' => 'staff',
-            'password' => bcrypt('password123'),
+            'name' => 'Kasir Utama',
+            'email' => 'kasir@sajipos.com',
+            'username' => 'kasir',
+            'password' => bcrypt('kasir12345'),
             'roles' => 'staff',
         ]);
 
-        // User (Kasir)
-        User::factory()->create([
-            'name' => 'Kasir SajiPOS',
-            'email' => 'kasir@sajipos.com',
-            'username' => 'kasir',
-            'password' => bcrypt('password123'),
-            'roles' => 'user',
-        ]);
+        // HAPUS pembuatan 15 user dummy karena sangat berbahaya di production 
+        // (passwordnya seragam dan bisa ditebak orang)
 
-        // 15 dummy users
-        User::factory(15)->create();
-
-        // Seed Categories
+        // Seed Master Data
         $this->call(CategorySeeder::class);
-
-        // Seed Products
         $this->call(ProductSeeder::class);
-
-        // Seed Discounts
         $this->call(DiscountSeeder::class);
-
-        // Seed Orders
-        $this->call(OrderSeeder::class);
+        
+        // HAPUS OrderSeeder agar data laporan kosong saat pertama kali rilis
+        // $this->call(OrderSeeder::class);
     }
 }
