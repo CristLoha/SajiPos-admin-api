@@ -18,6 +18,13 @@ Route::get('/run-cmd', function () {
     return "<pre>$output</pre>";
 });
 
+// ROUTE TEST LOG
+Route::get('/test-log', function () {
+    \Illuminate\Support\Facades\Log::info('TEST LOG DARURAT BERHASIL!');
+    return 'Log tested! Path: ' . storage_path('logs/laravel.log');
+});
+
+
 // Halaman Dokumentasi API untuk Frontend Developer
 Route::get('/docs', function () {
     return view('pages.docs.api');
