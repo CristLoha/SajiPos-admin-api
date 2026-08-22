@@ -1,0 +1,14 @@
+/**
+ *
+ * You can write your CSS code here, DO NOT touch the default JavaScript file
+ * because it will make it harder for you to update.
+ * 
+ */
+
+/* Fix: Prevent text-transform on navbar user name */
+.navbar .nav-link.nav-link-user,
+.navbar .nav-link.nav-link-user * {
+    text-transform: none !important;
+    font-variant: normal !important;
+    font-variant-caps: normal !important;
+}
