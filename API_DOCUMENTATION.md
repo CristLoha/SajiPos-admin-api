@@ -757,3 +757,82 @@ Menyimpan perubahan pengaturan biaya.
     }
 }
 ```
+
+---
+
+## 8. 📈 API Analitik (Analytics)
+
+Mengambil data statistik penjualan untuk ditampilkan di aplikasi kasir atau dashboard frontend.
+
+### A. GET Menu Terlaris (Top Menus)
+Mengambil daftar menu paling laris secara keseluruhan (berdasarkan total kuantitas yang terjual).
+
+-   **URL:** `/menu-terlaris`
+-   **Method:** `GET`
+-   **Headers:**
+    -   `Authorization: Bearer <your-token>`
+-   **Auth Required:** Yes (Sanctum)
+
+#### 📥 Response (200 OK)
+```json
+{
+    "success": true,
+    "message": "Data menu terlaris",
+    "data": [
+        {
+            "product_id": 1,
+            "name": "Nasi Goreng Special 43",
+            "total_sold": 150
+        }
+    ]
+}
+```
+
+### B. GET Menu Terlaris Harian (Daily Top Menus)
+Mengambil daftar menu paling laris khusus untuk hari ini saja.
+
+-   **URL:** `/menu-terlaris/harian`
+-   **Method:** `GET`
+-   **Headers:**
+    -   `Authorization: Bearer <your-token>`
+-   **Auth Required:** Yes (Sanctum)
+
+#### 📥 Response (200 OK)
+Format response sama seperti endpoint Menu Terlaris di atas, namun difilter untuk transaksi hari ini.
+
+---
+
+## 9. 🛠️ API Utilitas Tambahan
+
+### A. GET Validasi Kode Diskon (Check Code)
+Mengecek apakah sebuah kode diskon/promo valid dan bisa digunakan oleh kasir.
+
+-   **URL:** `/discounts/check-code?code=WCB20`
+-   **Method:** `GET`
+-   **Headers:**
+    -   `Authorization: Bearer <your-token>`
+-   **Auth Required:** Yes (Sanctum)
+
+#### 📥 Response (200 OK - Jika Valid)
+Akan mengembalikan detail objek diskon yang bersangkutan.
+
+#### 📥 Response (404 Not Found - Jika Invalid)
+```json
+{
+    "success": false,
+    "message": "Kode diskon tidak ditemukan, belum aktif, atau sudah kedaluwarsa"
+}
+```
+
+### B. POST Kalkulasi Total Belanja (Hitung Total)
+Mengirimkan rincian keranjang belanja ke server untuk dikalkulasikan total akhirnya (termasuk pajak, layanan, ongkir, dan diskon) sebelum kasir melakukan proses Checkout/Bayar sesungguhnya.
+
+-   **URL:** `/orders/hitung-total`
+-   **Method:** `POST`
+-   **Headers:**
+    -   `Content-Type: application/json`
+    -   `Authorization: Bearer <your-token>`
+-   **Auth Required:** Yes (Sanctum)
+
+#### 📤 Request Body (JSON)
+Format data sama persis dengan **POST Simpan Transaksi Baru** (hanya data order/items-nya saja).
