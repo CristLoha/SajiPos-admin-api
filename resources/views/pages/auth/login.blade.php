@@ -74,7 +74,18 @@
 @endsection
 
 @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        @if ($errors->has('email'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Waduh...',
+                text: '{{ $errors->first('email') }}',
+                confirmButtonColor: '#6777ef',
+                confirmButtonText: 'Siap Bung!'
+            });
+        @endif
+
         document.getElementById('togglePassword').addEventListener('click', function() {
             const passwordInput = document.getElementById('password');
             const icon = document.getElementById('toggleIcon');
