@@ -36,7 +36,8 @@ class BroadcastPromoJob implements ShouldQueue
                 ? "Diskon {$this->campaign->discount_value}% menantimu!" 
                 : "Potongan harga Rp " . number_format($this->campaign->discount_value, 0, ',', '.') . "!";
             
-            $message = CloudMessage::withTarget('topic', 'promo_broadcast')
+            $message = CloudMessage::new()
+                ->withTopic('promo_broadcast')
                 ->withNotification(Notification::create('Ada Promo Baru: ' . $this->campaign->name, $messageBody))
                 ->withData(['campaign_id' => $this->campaign->id, 'action' => 'open_promo']);
             
