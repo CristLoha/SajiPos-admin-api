@@ -247,7 +247,7 @@
 
         {{-- Greeting --}}
         <div class="sp-greeting mb-4">
-            <h2>Selamat datang kembali! 👋</h2>
+            <h2>Selamat datang, {{ auth()->user()->name }}! 👋</h2>
             <p>Berikut ringkasan aktivitas restoran hari ini.</p>
         </div>
 
