@@ -66,9 +66,6 @@
                 </div>
             </form>
 
-            <div class="mt-4 text-center text-muted">
-                Belum punya akun? <a href="{{ route('register') }}">Daftar di sini</a>
-            </div>
         </div>
     </div>
 @endsection
