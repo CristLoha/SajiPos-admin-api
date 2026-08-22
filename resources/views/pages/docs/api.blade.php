@@ -71,19 +71,7 @@
             padding: 4px 10px;
             border-radius: 999px;
         }
-        .header-actions a {
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--text-muted);
-            transition: color 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .header-actions a:hover {
-            color: var(--primary);
-        }
+
 
         /* Layout Grid */
         .layout {
@@ -379,26 +367,6 @@
             <h1>SajiPOS</h1>
             <span>API Docs</span>
         </a>
-        <div class="header-actions">
-            @auth
-                <a href="{{ route('home') }}">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="19" y1="12" x2="5" y2="12"></line>
-                        <polyline points="12 19 5 12 12 5"></polyline>
-                    </svg>
-                    Kembali ke Dashboard
-                </a>
-            @endauth
-            @guest
-                <a href="{{ route('login') }}">
-                    Login Kasir
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                        <polyline points="12 5 19 12 12 19"></polyline>
-                    </svg>
-                </a>
-            @endguest
-        </div>
     </header>
 
     <div class="layout">
