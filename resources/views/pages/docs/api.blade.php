@@ -93,15 +93,7 @@
             background: #ffffff;
             border-right: 1px solid var(--border-color);
         }
-        .sidebar h3 {
-            margin-top: 0;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            font-weight: 700;
-            color: var(--text-muted);
-            margin-bottom: 1.5rem;
-        }
+
 
         
         .toc-group {
@@ -371,7 +363,6 @@
 
     <div class="layout">
         <aside class="sidebar">
-            <h3>Daftar Isi</h3>
             <div id="toc"></div>
         </aside>
 
