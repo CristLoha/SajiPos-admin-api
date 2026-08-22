@@ -38,7 +38,7 @@ class CampaignController extends Controller
         $this->isAdmin();
 
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:campaigns,name',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'discount_type' => 'required|in:percent,nominal',
@@ -81,7 +81,7 @@ class CampaignController extends Controller
         $this->isAdmin();
 
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:campaigns,name,' . $campaign->id,
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'discount_type' => 'required|in:percent,nominal',
