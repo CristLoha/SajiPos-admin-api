@@ -6,7 +6,7 @@ Dokumentasi ini dibuat untuk mempermudah integrasi API antara Backend Laravel da
 
 ## 📌 Base URL
 
-```http
+```text
 http://<your-laravel-domain-or-ip>/api
 ```
 

@@ -96,7 +96,7 @@
         .toc-group {
             margin-bottom: 0.5rem;
         }
-        .sidebar li.toc-h2 {
+        .sidebar .toc-h2 {
             font-weight: 600;
             color: var(--text-main);
             font-size: 0.95rem;
@@ -109,17 +109,17 @@
             align-items: center;
             user-select: none;
         }
-        .sidebar li.toc-h2:hover {
+        .sidebar .toc-h2:hover {
             background: #f1f5f9;
             color: var(--primary);
         }
-        .sidebar li.toc-h2::after {
+        .sidebar .toc-h2::after {
             content: '▾';
             color: #94a3b8;
             font-size: 0.8rem;
             transition: transform 0.2s;
         }
-        .sidebar li.toc-h2.collapsed::after {
+        .sidebar .toc-h2.collapsed::after {
             transform: rotate(-90deg);
         }
         
@@ -392,26 +392,26 @@
                 text = text.replace(/^[0-9A-Z]+\.\s*/i, '').trim();
 
                 if (h.tagName === 'H2') {
-                    // Buat container grup untuk H2 dan H3 di bawahnya
-                    currentGroup = document.createElement('div');
+                    // Buat container grup untuk H2 dan H3 di bawahnya (harus <li> karena bapaknya <ul>)
+                    currentGroup = document.createElement('li');
                     currentGroup.className = 'toc-group';
                     
-                    const h2Li = document.createElement('li');
-                    h2Li.className = 'toc-h2';
-                    h2Li.textContent = text;
+                    const h2Header = document.createElement('div');
+                    h2Header.className = 'toc-h2';
+                    h2Header.textContent = text;
+                    h2Header.classList.add('collapsed');
                     
                     // Container untuk H3 (Bisa di-collapse)
                     currentSubList = document.createElement('ul');
                     currentSubList.className = 'toc-sublist collapsed'; // Default disembunyikan
-                    h2Li.classList.add('collapsed');
                     
                     // Fitur Accordion Toggle
-                    h2Li.addEventListener('click', () => {
-                        h2Li.classList.toggle('collapsed');
+                    h2Header.addEventListener('click', () => {
+                        h2Header.classList.toggle('collapsed');
                         currentSubList.classList.toggle('collapsed');
                     });
                     
-                    currentGroup.appendChild(h2Li);
+                    currentGroup.appendChild(h2Header);
                     currentGroup.appendChild(currentSubList);
                     toc.appendChild(currentGroup);
                     
