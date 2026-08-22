@@ -163,9 +163,10 @@
                     icon: 'warning',
                     showCancelButton: true,
                     buttonsStyling: false,
+                    width: '400px',
                     customClass: {
-                        confirmButton: 'btn btn-danger mr-2',
-                        cancelButton: 'btn btn-secondary'
+                        confirmButton: 'btn btn-danger',
+                        cancelButton: 'btn btn-light mr-3'
                     },
                     confirmButtonText: 'Ya, Hapus!',
                     cancelButtonText: 'Batal',
