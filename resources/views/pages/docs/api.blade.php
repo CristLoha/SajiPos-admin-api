@@ -373,6 +373,9 @@
             const headings = md.querySelectorAll('h2, h3');
             const toc = document.getElementById('toc');
             
+            // HAPUS isi TOC lama jika zero-md melakukan re-render (mencegah duplikat di bawah)
+            toc.innerHTML = '';
+            
             // Generate TOC (Accordion Style)
             let currentGroup = null;
             let currentSubList = null;
