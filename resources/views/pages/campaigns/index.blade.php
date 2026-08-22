@@ -162,8 +162,11 @@
                     text: "Campaign '" + name + "' akan dihapus permanen dan tidak bisa dikembalikan!",
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#fc544b',
-                    cancelButtonColor: '#6777ef',
+                    buttonsStyling: false,
+                    customClass: {
+                        confirmButton: 'btn btn-danger mr-2',
+                        cancelButton: 'btn btn-secondary'
+                    },
                     confirmButtonText: 'Ya, Hapus!',
                     cancelButtonText: 'Batal',
                     reverseButtons: true
