@@ -171,10 +171,11 @@
             margin-top: 1.5rem !important;
         }
         .markdown-body pre {
-            background-color: #282c34 !important; /* Tema lebih lembut (One Dark) */
+            background-color: #f8fafc !important; /* Latar belakang terang ala Stripe/Notion */
+            border: 1px solid var(--border-color) !important;
             border-radius: 8px !important;
             padding: 1.25rem !important;
-            box-shadow: inset 0 1px 4px rgba(0,0,0,0.1);
+            box-shadow: none !important;
         }
         /* Menyembunyikan nomor baris jika plugin Prism line-numbers aktif */
         .markdown-body pre .line-numbers-rows {
@@ -187,15 +188,16 @@
         .markdown-body pre code {
             font-family: 'JetBrains Mono', ui-monospace, monospace !important;
             font-size: 13.5px !important;
-            color: #abb2bf !important; /* Warna teks default One Dark */
+            color: #334155 !important; /* Teks abu-abu gelap */
             text-shadow: none !important;
         }
         
-        /* Custom syntax highlight colors to look softer */
-        .markdown-body .token.property, .markdown-body .token.string { color: #98c379 !important; } /* Soft Green */
-        .markdown-body .token.number, .markdown-body .token.boolean { color: #d19a66 !important; } /* Soft Orange */
-        .markdown-body .token.punctuation, .markdown-body .token.operator { color: #abb2bf !important; } /* Soft Gray */
-        .markdown-body .token.keyword { color: #c678dd !important; } /* Soft Purple */
+        /* Custom syntax highlight colors (Light & Clean Minimalist) */
+        .markdown-body .token.property { color: #0f172a !important; font-weight: 500; } /* Key JSON: gelap tebal */
+        .markdown-body .token.string { color: #0284c7 !important; } /* Value String: biru tenang */
+        .markdown-body .token.number, .markdown-body .token.boolean { color: #059669 !important; } /* Angka/Boolean: hijau kalem */
+        .markdown-body .token.punctuation, .markdown-body .token.operator { color: #94a3b8 !important; } /* Tanda kurung/koma: abu-abu redup */
+        .markdown-body .token.keyword { color: #db2777 !important; }
 
         .markdown-body code {
             font-family: 'JetBrains Mono', ui-monospace, monospace !important;
