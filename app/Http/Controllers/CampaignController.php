@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Campaign;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Kreait\Laravel\Firebase\Facades\Firebase;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Notification;
+use Illuminate\Support\Facades\Log;
 
 class CampaignController extends Controller
 {
@@ -51,6 +55,28 @@ class CampaignController extends Controller
 
         if ($request->has('products')) {
             $campaign->products()->sync($request->products);
+        }
+
+        // ==========================================
+        // FITUR NOMOR 3: BROADCAST PROMO KE PELANGGAN VIA FCM
+        // ==========================================
+        if ($campaign->is_active) {
+            try {
+                $messaging = Firebase::messaging();
+                
+                $messageBody = $campaign->discount_type == 'percent' 
+                    ? "Diskon {$campaign->discount_value}% menantimu!" 
+                    : "Potongan harga Rp " . number_format($campaign->discount_value, 0, ',', '.') . "!";
+                
+                $message = CloudMessage::withTarget('topic', 'promo_broadcast')
+                    ->withNotification(Notification::create('Ada Promo Baru: ' . $campaign->name, $messageBody))
+                    ->withData(['campaign_id' => $campaign->id, 'action' => 'open_promo']);
+                
+                $messaging->send($message);
+            } catch (\Exception $e) {
+                // Ignore error if Firebase is not properly configured yet
+                Log::error('FCM Broadcast Error: ' . $e->getMessage());
+            }
         }
 
         return redirect()->route('campaigns.index')->with('success', 'Campaign berhasil ditambahkan!');
