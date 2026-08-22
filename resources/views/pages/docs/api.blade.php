@@ -87,11 +87,7 @@
             color: var(--text-muted);
             margin-bottom: 1.5rem;
         }
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+
         
         .toc-group {
             margin-bottom: 0.5rem;
@@ -136,21 +132,20 @@
             opacity: 0;
         }
         
-        .sidebar li.toc-h3 {
-            font-size: 0.85rem;
-            margin: 0 !important;
-        }
-        .sidebar li.toc-h3 a {
+        .sidebar .toc-h3 {
             text-decoration: none;
             color: var(--text-muted);
             display: block;
             padding: 0.4rem 0.75rem;
+            font-size: 0.85rem;
             line-height: 1.4;
             transition: all 0.2s;
             border-left: 2px solid transparent;
             margin-left: -1px;
+            margin-bottom: 0 !important;
+            margin-top: 0 !important;
         }
-        .sidebar li.toc-h3 a:hover {
+        .sidebar .toc-h3:hover {
             color: var(--primary);
             background: #f8fafc;
             border-left-color: var(--primary);
@@ -357,7 +352,7 @@
     <div class="layout">
         <aside class="sidebar">
             <h3>Daftar Isi</h3>
-            <ul id="toc"></ul>
+            <div id="toc"></div>
         </aside>
 
         <main class="content">
@@ -392,8 +387,8 @@
                 text = text.replace(/^[0-9A-Z]+\.\s*/i, '').trim();
 
                 if (h.tagName === 'H2') {
-                    // Buat container grup untuk H2 dan H3 di bawahnya (harus <li> karena bapaknya <ul>)
-                    currentGroup = document.createElement('li');
+                    // Gunakan DIV agar lebih aman dari isu rendering browser
+                    currentGroup = document.createElement('div');
                     currentGroup.className = 'toc-group';
                     
                     const h2Header = document.createElement('div');
@@ -401,11 +396,10 @@
                     h2Header.textContent = text;
                     h2Header.classList.add('collapsed');
                     
-                    // Container untuk H3 (Bisa di-collapse)
-                    currentSubList = document.createElement('ul');
-                    currentSubList.className = 'toc-sublist collapsed'; // Default disembunyikan
+                    // Container untuk Sub-menu (DIV)
+                    currentSubList = document.createElement('div');
+                    currentSubList.className = 'toc-sublist collapsed';
                     
-                    // Fitur Accordion Toggle
                     h2Header.addEventListener('click', () => {
                         h2Header.classList.toggle('collapsed');
                         currentSubList.classList.toggle('collapsed');
@@ -416,14 +410,12 @@
                     toc.appendChild(currentGroup);
                     
                 } else if (h.tagName === 'H3' && currentSubList) {
-                    const li = document.createElement('li');
-                    li.className = 'toc-h3';
                     const a = document.createElement('a');
+                    a.className = 'toc-h3';
                     a.href = '#' + h.id;
                     a.textContent = text;
                     
-                    li.appendChild(a);
-                    currentSubList.appendChild(li);
+                    currentSubList.appendChild(a);
                     
                     a.addEventListener('click', function(e) {
                         e.preventDefault();
