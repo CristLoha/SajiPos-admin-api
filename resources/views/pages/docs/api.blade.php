@@ -30,32 +30,59 @@
             color: var(--text-main);
         }
         
-        /* Header Styling */
+        /* Modern Header Styling */
         .header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 1.5rem 2rem;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: var(--text-main);
+            padding: 0 2rem;
+            height: 70px;
             position: sticky;
             top: 0;
             z-index: 50;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
-        .header-title h1 {
-            margin: 0;
-            font-weight: 700;
-            font-size: 1.5rem;
+        .header-brand {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-main);
         }
-        .header-title p {
+        .header-brand img {
+            height: 32px;
+            width: auto;
+        }
+        .header-brand h1 {
             margin: 0;
-            margin-top: 0.25rem;
-            opacity: 0.9;
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: -0.5px;
+        }
+        .header-brand span {
             font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            background: #e0e7ff;
+            padding: 4px 10px;
+            border-radius: 999px;
+        }
+        .header-actions a {
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .header-actions a:hover {
+            color: var(--primary);
         }
 
         /* Layout Grid */
@@ -70,9 +97,9 @@
         .sidebar {
             width: 300px;
             flex-shrink: 0;
-            height: calc(100vh - 80px);
+            height: calc(100vh - 70px);
             position: sticky;
-            top: 80px;
+            top: 70px;
             overflow-y: auto;
             padding: 2rem 1.5rem;
             background: #ffffff;
@@ -346,12 +373,22 @@
 </head>
 <body>
 
-    <div class="header">
-        <div class="header-title">
-            <h1>📚 SajiPOS API Docs</h1>
-            <p>Referensi integrasi Backend ↔ Frontend</p>
+    <header class="header">
+        <a href="#" class="header-brand">
+            <img src="{{ asset('favicon.svg') }}" alt="SajiPOS">
+            <h1>SajiPOS</h1>
+            <span>API Docs</span>
+        </a>
+        <div class="header-actions">
+            <a href="/">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Kembali ke Dashboard
+            </a>
         </div>
-    </div>
+    </header>
 
     <div class="layout">
         <aside class="sidebar">
