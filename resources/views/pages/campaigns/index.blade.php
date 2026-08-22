@@ -108,12 +108,13 @@
                                                                     <i class="fas fa-edit"></i>
                                                                 </a>
 
-                                                                <form action="{{ route('campaigns.destroy', $campaign->id) }}"
-                                                                    method="POST" class="ml-1"
-                                                                    onsubmit="return confirm('Apakah Anda yakin ingin menghapus campaign ini?');">
+                                                                <form action="{{ route('campaigns.destroy', $campaign->id) }}" method="POST"
+                                                                    class="ml-1 delete-form" id="delete-form-{{ $campaign->id }}">
                                                                     @csrf
                                                                     @method('DELETE')
-                                                                    <button class="btn btn-sm btn-danger btn-icon"
+                                                                    <button type="button" class="btn btn-sm btn-danger btn-icon confirm-delete"
+                                                                        data-id="{{ $campaign->id }}"
+                                                                        data-name="{{ $campaign->name }}"
                                                                         data-toggle="tooltip" title="Hapus Campaign">
                                                                         <i class="fas fa-trash-alt"></i>
                                                                     </button>
@@ -146,3 +147,32 @@
         </section>
     </div>
 @endsection
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function() {
+            $('.confirm-delete').click(function(e) {
+                e.preventDefault();
+                let formId = $(this).closest('form').attr('id');
+                let name = $(this).data('name');
+
+                Swal.fire({
+                    title: 'Yakin mau dihapus?',
+                    text: "Campaign '" + name + "' akan dihapus permanen dan tidak bisa dikembalikan!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#fc544b',
+                    cancelButtonColor: '#6777ef',
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $('#' + formId).submit();
+                    }
+                });
+            });
+        });
+    </script>
+@endpush
