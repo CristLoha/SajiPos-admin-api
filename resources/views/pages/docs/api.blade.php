@@ -118,6 +118,10 @@
         .sidebar .toc-h2.collapsed::after {
             transform: rotate(-90deg);
         }
+        /* Sembunyikan panah jika tidak ada anak (misal: Base URL) */
+        .sidebar .toc-h2.no-children::after {
+            display: none;
+        }
         
         .toc-sublist {
             overflow: hidden;
@@ -410,6 +414,12 @@
                     thisHeader.addEventListener('click', () => {
                         thisHeader.classList.toggle('collapsed');
                         thisSubList.classList.toggle('collapsed');
+                        
+                        // Scroll langsung ke judul H2-nya biar UX lebih mantap
+                        window.scrollTo({
+                            top: h.getBoundingClientRect().top + window.scrollY - 90,
+                            behavior: 'smooth'
+                        });
                     });
                     
                     currentGroup.appendChild(h2Header);
@@ -431,6 +441,13 @@
                             behavior: 'smooth'
                         });
                     });
+                }
+            });
+
+            // Hapus ikon panah (accordion) untuk H2 yang tidak punya sub-poin (seperti Base URL)
+            document.querySelectorAll('.toc-sublist').forEach(sub => {
+                if (sub.children.length === 0) {
+                    sub.previousElementSibling.classList.add('no-children');
                 }
             });
 
