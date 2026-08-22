@@ -9,22 +9,6 @@ Route::get('/', function () {
     return redirect()->route('home');
 });
 
-// ROUTE DARURAT BUAT NGE-RUN COMPOSER DI HOSTING TANPA SSH
-Route::get('/run-cmd', function () {
-    $output = shell_exec('composer install 2>&1');
-    $output .= "\n\n" . shell_exec('composer dump-autoload 2>&1');
-    \Illuminate\Support\Facades\Artisan::call('optimize:clear');
-    $output .= "\n\n" . \Illuminate\Support\Facades\Artisan::output();
-    return "<pre>$output</pre>";
-});
-
-// ROUTE TEST LOG
-Route::get('/test-log', function () {
-    \Illuminate\Support\Facades\Log::info('TEST LOG DARURAT BERHASIL!');
-    return 'Log tested! Path: ' . storage_path('logs/laravel.log');
-});
-
-
 // Halaman Dokumentasi API untuk Frontend Developer
 Route::get('/docs', function () {
     return view('pages.docs.api');
