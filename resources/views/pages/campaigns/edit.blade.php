@@ -23,6 +23,8 @@
                     Di halaman ini Anda dapat mengubah data campaign.
                 </p>
 
+                @include('layouts.alert')
+
                 <div class="row">
                     <div class="col-12">
                         <div class="card">

@@ -23,6 +23,8 @@
                     Di halaman ini Anda dapat menambahkan data campaign / flash sale (Harga coret) baru.
                 </p>
 
+                @include('layouts.alert')
+
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
