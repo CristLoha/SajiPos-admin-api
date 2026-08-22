@@ -25,7 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->is('api/*')) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Waduh, terlalu banyak percobaan. Tunggu sebentar dan coba lagi ya bung!'
+                    'message' => 'Terlalu banyak percobaan login. Silakan tunggu beberapa saat dan coba lagi.'
                 ], 429);
             }
         });

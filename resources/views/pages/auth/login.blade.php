@@ -79,10 +79,10 @@
         @if ($errors->has('email'))
             Swal.fire({
                 icon: 'error',
-                title: 'Waduh...',
+                title: 'Peringatan',
                 text: '{{ $errors->first('email') }}',
                 confirmButtonColor: '#6777ef',
-                confirmButtonText: 'Siap Bung!'
+                confirmButtonText: 'Mengerti'
             });
         @endif
 
