@@ -26,24 +26,8 @@ class DatabaseSeeder extends Seeder
             'roles' => 'admin',
         ]);
 
-        // Akun Staff (Kasir)
-        User::factory()->create([
-            'name' => 'Kasir Utama',
-            'email' => 'kasir@sajipos.com',
-            'username' => 'kasir',
-            'password' => bcrypt('kasir12345'),
-            'roles' => 'staff',
-        ]);
-
-        // HAPUS pembuatan 15 user dummy karena sangat berbahaya di production 
-        // (passwordnya seragam dan bisa ditebak orang)
-
-        // Seed Master Data
-        $this->call(CategorySeeder::class);
-        $this->call(ProductSeeder::class);
-        $this->call(DiscountSeeder::class);
-        
-        // HAPUS OrderSeeder agar data laporan kosong saat pertama kali rilis
-        // $this->call(OrderSeeder::class);
+        // Hapus akun staff/kasir dan data dummy lainnya.
+        // Semua data master (Kategori, Produk, Diskon, Akun Staff) 
+        // silakan ditambahkan secara manual oleh Admin melalui Dashboard.
     }
 }
