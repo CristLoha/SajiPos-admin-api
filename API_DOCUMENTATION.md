@@ -848,3 +848,31 @@ Mengirimkan rincian keranjang belanja ke server untuk dikalkulasikan total akhir
 
 #### 📤 Request Body (JSON)
 Format data sama persis dengan **POST Simpan Transaksi Baru** (hanya data order/items-nya saja).
+
+## 7. 📢 Integrasi Push Notification (FCM Broadcast)
+
+Sistem backend SajiPOS secara otomatis akan melakukan _broadcast_ notifikasi promo (Campaign) setiap kali Admin membuat Campaign baru melalui panel web. Frontend (Mobile App) tidak memerlukan API khusus untuk menerima notifikasi ini, melainkan harus terhubung langsung dengan **Firebase Cloud Messaging (FCM)** menggunakan metode **Topic**.
+
+### 📱 Panduan Untuk Aplikasi Mobile (Frontend)
+
+Agar pelanggan dapat menerima notifikasi promo, pastikan aplikasi mobile melakukan langkah berikut:
+
+**1. Subscribe ke Topic FCM**
+Saat aplikasi dibuka atau pelanggan berhasil _login_, aplikasi wajib melakukan subscribe ke topik berikut:
+- **Nama Topic:** `promo_broadcast`
+
+*(Contoh kode pada Flutter: `await FirebaseMessaging.instance.subscribeToTopic("promo_broadcast");`)*
+
+**2. Struktur Data Payload (Data Tersembunyi)**
+Ketika pelanggan meng-klik notifikasi promo yang masuk, backend SajiPOS sudah menyisipkan data ekstra (payload) di dalam push notification tersebut dengan format JSON berikut:
+
+```json
+{
+    "campaign_id": 5,
+    "action": "open_promo"
+}
+```
+
+**3. Aksi Navigasi (Routing & Fetch Data)**
+Frontend dapat mem-parsing data payload tersebut. Jika `action` bernilai `"open_promo"`, maka Frontend bisa otomatis mengarahkan pelanggan ke layar/halaman **Detail Promo**, lalu mengambil data lengkap promo tersebut dengan melakukan request HTTP ke:
+👉 `GET /api/campaigns/{id}` *(gunakan `campaign_id` dari payload)*.
