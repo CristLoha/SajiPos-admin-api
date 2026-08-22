@@ -86,7 +86,10 @@ Mengambil seluruh daftar kategori produk makanan & minuman yang terdaftar di sis
     -   `Authorization: Bearer <your-token>`
 -   **Auth Required:** Yes (Sanctum)
 -   **Query Parameters:**
-    -   `name` (Opsional) - String pencarian spesifik berdasarkan nama kategori (contoh: `/categories?name=minuman`)
+
+| Parameter | Tipe | Wajib | Deskripsi |
+| :--- | :--- | :--- | :--- |
+| `name` | `string` | ❌ Tidak | Pencarian spesifik berdasarkan nama kategori. |
 
 ### 📥 Response (200 OK)
 
@@ -132,9 +135,12 @@ Mengambil seluruh daftar produk aktif. Mendukung filter pencarian menggunakan qu
     -   `Authorization: Bearer <your-token>`
 -   **Auth Required:** Yes (Sanctum)
 -   **Query Parameters:**
-    -   `search` (Opsional) - String pencarian berdasarkan nama atau deskripsi produk (contoh: `/products?search=nasgor`)
-    -   `name` (Opsional) - String pencarian spesifik berdasarkan nama produk (contoh: `/products?name=goreng`)
-    -   `category_id` (Opsional) - Filter produk berdasarkan ID kategori (contoh: `/products?category_id=1`)
+
+| Parameter | Tipe | Wajib | Deskripsi |
+| :--- | :--- | :--- | :--- |
+| `search` | `string` | ❌ Tidak | Pencarian berdasarkan nama atau deskripsi produk. |
+| `name` | `string` | ❌ Tidak | Pencarian spesifik berdasarkan nama produk saja. |
+| `category_id` | `integer` | ❌ Tidak | Filter produk berdasarkan ID kategori. |
 
 #### 📥 Response (200 OK)
 
@@ -233,8 +239,11 @@ Mengambil daftar diskon dengan dukungan filter status dan pencarian. Secara defa
     -   `Authorization: Bearer <your-token>`
 -   **Auth Required:** Yes (Sanctum)
 -   **Query Parameters:**
-    -   `status` (Opsional) - Filter berdasarkan status diskon: `active`, `upcoming`, atau `expired`.
-    -   `search` (Opsional) - Pencarian berdasarkan nama (`name`) atau kode promo (`code`).
+ 
+ | Parameter | Tipe | Wajib | Deskripsi |
+ | :--- | :--- | :--- | :--- |
+ | `status` | `string` | ❌ Tidak | Filter status: `active`, `upcoming`, atau `expired`. |
+ | `search` | `string` | ❌ Tidak | Pencarian berdasarkan nama promo atau kode. |
 
 > _Catatan: Field `status` pada response adalah hasil kalkulasi dinamis oleh sistem berdasarkan tanggal hari ini dibandingkan dengan `start_date` dan `expired_date`._
 
@@ -610,9 +619,12 @@ Mengambil daftar transaksi harian yang baru saja dilakukan oleh kasir. Mendukung
     -   `Authorization: Bearer <your-token>`
 -   **Auth Required:** Yes (Sanctum)
 -   **Query Parameters:**
-    -   `date` (Opsional) - Tanggal transaksi dalam format YYYY-MM-DD (default: hari ini).
-    -   `page` (Opsional) - Halaman pagination.
-    -   `limit` (Opsional) - Jumlah item per halaman (default: 15).
+ 
+ | Parameter | Tipe | Wajib | Deskripsi |
+ | :--- | :--- | :--- | :--- |
+ | `date` | `string` | ❌ Tidak | Filter transaksi berdasarkan tanggal (format `YYYY-MM-DD`). Default: hari ini. |
+ | `page` | `integer` | ❌ Tidak | Nomor halaman untuk *pagination*. |
+ | `limit` | `integer` | ❌ Tidak | Jumlah item per halaman. Default: 15. |
 
 #### 📥 Response (200 OK)
 

@@ -171,16 +171,32 @@
             margin-top: 1.5rem !important;
         }
         .markdown-body pre {
-            background-color: #0f172a !important;
+            background-color: #282c34 !important; /* Tema lebih lembut (One Dark) */
             border-radius: 8px !important;
             padding: 1.25rem !important;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: inset 0 1px 4px rgba(0,0,0,0.1);
+        }
+        /* Menyembunyikan nomor baris jika plugin Prism line-numbers aktif */
+        .markdown-body pre .line-numbers-rows {
+            display: none !important;
+        }
+        /* Kembalikan padding kiri karena nomor baris hilang */
+        .markdown-body pre[class*="language-"] {
+            padding-left: 1.25rem !important;
         }
         .markdown-body pre code {
             font-family: 'JetBrains Mono', ui-monospace, monospace !important;
             font-size: 13.5px !important;
-            color: #f8fafc !important;
+            color: #abb2bf !important; /* Warna teks default One Dark */
+            text-shadow: none !important;
         }
+        
+        /* Custom syntax highlight colors to look softer */
+        .markdown-body .token.property, .markdown-body .token.string { color: #98c379 !important; } /* Soft Green */
+        .markdown-body .token.number, .markdown-body .token.boolean { color: #d19a66 !important; } /* Soft Orange */
+        .markdown-body .token.punctuation, .markdown-body .token.operator { color: #abb2bf !important; } /* Soft Gray */
+        .markdown-body .token.keyword { color: #c678dd !important; } /* Soft Purple */
+
         .markdown-body code {
             font-family: 'JetBrains Mono', ui-monospace, monospace !important;
             font-size: 0.85em !important;
