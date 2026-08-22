@@ -9,6 +9,11 @@ Route::get('/', function () {
     return redirect()->route('home');
 });
 
+// Halaman Dokumentasi API untuk Frontend Developer
+Route::get('/docs', function () {
+    return view('pages.docs.api');
+})->name('docs');
+
 Route::middleware(['auth'])->group(function () {
 
     // Dashboard
