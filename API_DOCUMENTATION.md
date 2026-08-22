@@ -7,7 +7,7 @@ Dokumentasi ini dibuat untuk mempermudah integrasi API antara Backend Laravel da
 ## 📌 Base URL
 
 ```text
-http://<your-laravel-domain-or-ip>/api
+https://sajipos.domcloud.dev/api
 ```
 
 ---
