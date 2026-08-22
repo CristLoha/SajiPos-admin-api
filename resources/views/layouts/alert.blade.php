@@ -1,36 +1,36 @@
-@if (session('success'))
-    <div class="alert alert-success alert-dismissible show fade">
-        <div class="alert-body">
-            <button class="close" data-dismiss="alert">
-                <span>&times;</span>
-            </button>
-            {{ session('success') }}
-        </div>
-    </div>
-@endif
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+    });
 
-@if (session('error'))
-    <div class="alert alert-danger alert-dismissible show fade">
-        <div class="alert-body">
-            <button class="close" data-dismiss="alert">
-                <span>&times;</span>
-            </button>
-            {{ session('error') }}
-        </div>
-    </div>
-@endif
+    @if (session('success'))
+        Toast.fire({
+            icon: 'success',
+            title: '{!! addslashes(session("success")) !!}'
+        });
+    @endif
 
-@if ($errors->any())
-    <div class="alert alert-danger alert-dismissible show fade">
-        <div class="alert-body">
-            <button class="close" data-dismiss="alert">
-                <span>&times;</span>
-            </button>
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    </div>
-@endif
+    @if (session('error'))
+        Toast.fire({
+            icon: 'error',
+            title: '{!! addslashes(session("error")) !!}'
+        });
+    @endif
+
+    @if ($errors->any())
+        Toast.fire({
+            icon: 'error',
+            title: 'Validasi Gagal!',
+            html: '<ul style="text-align: left; margin: 0; padding-left: 20px;">@foreach ($errors->all() as $error)<li>{{ addslashes($error) }}</li>@endforeach</ul>'
+        });
+    @endif
+</script>
