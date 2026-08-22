@@ -25,8 +25,8 @@ class DashboardController extends Controller
         // 3. Menu Aktif (Produk ready)
         $activeProductsCount = Product::where('status', true)->count();
 
-        // 4. Jumlah Karyawan
-        $employeesCount = User::whereIn('roles', ['admin', 'staff'])->count();
+        // 4. Jumlah Karyawan (Hanya staff/kasir, admin bukan karyawan)
+        $employeesCount = User::whereIn('roles', ['staff', 'user'])->count();
 
         // 5. Riwayat Pesanan Terbaru (5 Transaksi Terakhir)
         $recentOrders = Order::with('items.product')->orderBy('transaction_time', 'desc')->limit(5)->get();
