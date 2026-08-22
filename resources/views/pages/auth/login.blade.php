@@ -96,5 +96,19 @@
                 icon.classList.add('fa-eye');
             }
         });
+
+        // Menghilangkan error seketika (real-time) saat user mulai mengetik ulang
+        document.querySelectorAll('input').forEach(function(input) {
+            input.addEventListener('input', function() {
+                this.classList.remove('is-invalid');
+                const formGroup = this.closest('.form-group');
+                if (formGroup) {
+                    const errorMessage = formGroup.querySelector('.text-danger');
+                    if (errorMessage) {
+                        errorMessage.style.display = 'none';
+                    }
+                }
+            });
+        });
     </script>
 @endpush
