@@ -403,9 +403,13 @@
                     currentSubList = document.createElement('div');
                     currentSubList.className = 'toc-sublist collapsed';
                     
-                    h2Header.addEventListener('click', () => {
-                        h2Header.classList.toggle('collapsed');
-                        currentSubList.classList.toggle('collapsed');
+                    // Gunakan const agar closure mengikat elemen yang benar, bukan elemen terakhir di loop!
+                    const thisHeader = h2Header;
+                    const thisSubList = currentSubList;
+                    
+                    thisHeader.addEventListener('click', () => {
+                        thisHeader.classList.toggle('collapsed');
+                        thisSubList.classList.toggle('collapsed');
                     });
                     
                     currentGroup.appendChild(h2Header);
@@ -422,9 +426,8 @@
                     
                     a.addEventListener('click', function(e) {
                         e.preventDefault();
-                        const target = document.getElementById(h.id);
                         window.scrollTo({
-                            top: target.getBoundingClientRect().top + window.scrollY - 90,
+                            top: h.getBoundingClientRect().top + window.scrollY - 90,
                             behavior: 'smooth'
                         });
                     });
