@@ -352,8 +352,13 @@
                 const a = document.createElement('a');
                 a.href = '#' + h.id;
                 
+                // Hapus emoji di depan teks untuk TOC agar lebih rapi
                 let text = h.textContent;
                 text = text.replace(/[\u{1F300}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').trim();
+                
+                // Hapus penomoran bab (seperti "0. ", "1. ", "A. ", "B. ") biar bersih
+                text = text.replace(/^[0-9A-Z]+\.\s*/i, '').trim();
+                
                 a.textContent = text;
                 
                 li.appendChild(a);
