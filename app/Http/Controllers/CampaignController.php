@@ -29,7 +29,13 @@ class CampaignController extends Controller
     public function create()
     {
         $this->isAdmin();
-        $products = Product::where('status', true)->get();
+        // Exclude products that are in an active campaign
+        $products = Product::where('status', true)
+            ->whereDoesntHave('campaigns', function ($query) {
+                $query->where('is_active', true)
+                      ->where('end_date', '>=', now());
+            })
+            ->get();
         return view('pages.campaigns.create', compact('products'));
     }
 
@@ -72,7 +78,14 @@ class CampaignController extends Controller
     public function edit(Campaign $campaign)
     {
         $this->isAdmin();
-        $products = Product::where('status', true)->get();
+        // Exclude products that are in other active campaigns
+        $products = Product::where('status', true)
+            ->whereDoesntHave('campaigns', function ($query) use ($campaign) {
+                $query->where('campaigns.id', '!=', $campaign->id)
+                      ->where('is_active', true)
+                      ->where('end_date', '>=', now());
+            })
+            ->get();
         return view('pages.campaigns.edit', compact('campaign', 'products'));
     }
 
