@@ -22,7 +22,7 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $products = Product::with(['category'])
+        $products = Product::with(['category', 'campaigns'])
             ->when($request->name, function ($query) use ($request) {
                 $query->where('name', 'like', '%' . $request->name . '%');
             })
@@ -88,7 +88,7 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        $product = Product::with('category')->findOrFail($id);
+        $product = Product::with(['category', 'campaigns'])->findOrFail($id);
         return view('pages.products.show', compact('product'));
     }
 

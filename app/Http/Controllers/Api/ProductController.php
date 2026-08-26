@@ -14,8 +14,8 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        // Inisiasi query untuk mengambil produk aktif beserta relasi kategorinya dan diskon
-        $query = Product::with(['category'])->where('status', true);
+        // Inisiasi query untuk mengambil produk aktif beserta relasi kategorinya, diskon, dan campaigns
+        $query = Product::with(['category', 'campaigns'])->where('status', true);
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
@@ -32,8 +32,8 @@ class ProductController extends Controller
             $query->where('category_id', $request->category_id);
         }
 
-        // Eksekusi query
-        $products = $query->get();
+        // Eksekusi query dan prioritaskan produk yang masuk campaign di atas
+        $products = $query->get()->sortByDesc('is_campaign_active')->values();
 
         return response()->json([
             'success' => true,
@@ -48,7 +48,7 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        $product = Product::with(['category'])->find($id);
+        $product = Product::with(['category', 'campaigns'])->find($id);
 
         if (!$product) {
             return response()->json([

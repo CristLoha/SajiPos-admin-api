@@ -34,19 +34,17 @@ class Product extends Model
 
     public function getIsCampaignActiveAttribute()
     {
-        $campaign = $this->campaigns()->where('is_active', true)
-            ->where('start_date', '<=', now())
-            ->where('end_date', '>=', now())
-            ->first();
+        $campaign = $this->campaigns->first(function ($campaign) {
+            return $campaign->is_active && $campaign->start_date <= now() && $campaign->end_date >= now();
+        });
         return $campaign ? true : false;
     }
 
     public function getDiscountPriceAttribute()
     {
-        $campaign = $this->campaigns()->where('is_active', true)
-            ->where('start_date', '<=', now())
-            ->where('end_date', '>=', now())
-            ->first();
+        $campaign = $this->campaigns->first(function ($campaign) {
+            return $campaign->is_active && $campaign->start_date <= now() && $campaign->end_date >= now();
+        });
 
         if ($campaign) {
             if ($campaign->discount_type == 'percentage' || $campaign->discount_type == 'percent') {
