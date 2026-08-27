@@ -196,43 +196,93 @@ class OrderController extends Controller
             if (in_array($paymentMethod, ['qris', 'transfer', 'bank_transfer'])) {
                 $invoiceNumber = 'ORD-' . str_pad($order->id, 4, '0', STR_PAD_LEFT);
                 $serverKey = config('services.midtrans.server_key');
-                
-                $enabledPayments = [];
-                if ($paymentMethod === 'qris') {
-                    $enabledPayments = ['other_qris'];
-                } else {
-                    $enabledPayments = ['bca_va', 'bni_va', 'bri_va', 'permata_va', 'cimb_va', 'other_va', 'echannel'];
-                }
-                
                 $midtransOrderId = $invoiceNumber . '-' . time();
-                // Panggil API Midtrans SNAP
-                $response = \Illuminate\Support\Facades\Http::withBasicAuth($serverKey, '')
-                    ->withHeaders([
-                        'X-Override-Notification' => url('/api/midtrans/webhook')
-                    ])
-                    ->post('https://app.sandbox.midtrans.com/snap/v1/transactions', [
-                        'transaction_details' => [
-                            'order_id' => $midtransOrderId, // Tambah time() agar order_id unique saat retry
-                            'gross_amount' => (int) $order->total
-                        ],
-                        'enabled_payments' => $enabledPayments
-                    ]);
+                
+                if ($paymentMethod === 'qris') {
+                    // Panggil API Midtrans CORE API khusus untuk QRIS
+                    $response = \Illuminate\Support\Facades\Http::withBasicAuth($serverKey, '')
+                        ->withHeaders([
+                            'Content-Type' => 'application/json',
+                            'Accept' => 'application/json',
+                            'X-Override-Notification' => url('/api/midtrans/webhook')
+                        ])
+                        ->post('https://api.sandbox.midtrans.com/v2/charge', [
+                            'payment_type' => 'qris',
+                            'transaction_details' => [
+                                'order_id' => $midtransOrderId,
+                                'gross_amount' => (int) $order->total
+                            ],
+                            'qris' => [
+                                'acquirer' => 'gopay'
+                            ]
+                        ]);
 
-                if ($response->successful()) {
-                    $snapData = $response->json();
-                    
-                    // Simpan ke database
-                    $order->midtrans_order_id = $midtransOrderId;
-                    $order->payment_token = $snapData['token'] ?? null;
-                    $order->save();
+                    if ($response->successful()) {
+                        $coreData = $response->json();
+                        
+                        // Ekstrak QR String atau Image URL dari response
+                        $qrString = $coreData['qr_string'] ?? null;
+                        
+                        // Cari action url untuk gambar QRIS (opsional jika qr_string tidak mau digambar manual)
+                        $qrImageUrl = null;
+                        if (isset($coreData['actions']) && is_array($coreData['actions'])) {
+                            foreach ($coreData['actions'] as $action) {
+                                if ($action['name'] === 'generate-qr-code') {
+                                    $qrImageUrl = $action['url'];
+                                    break;
+                                }
+                            }
+                        }
 
-                    $paymentDetails = [
-                        'transaction_id' => $midtransOrderId,
-                        'snap_token' => $snapData['token'] ?? null,
-                        'snap_redirect_url' => $snapData['redirect_url'] ?? null,
-                    ];
+                        // Simpan ke database
+                        $order->midtrans_order_id = $midtransOrderId;
+                        // Simpan qr_string ke payment_token (bisa di-reuse field-nya) atau biarkan kosong
+                        $order->payment_token = $qrString;
+                        $order->save();
+
+                        $paymentDetails = [
+                            'transaction_id' => $midtransOrderId,
+                            'payment_type' => 'qris',
+                            'qr_string' => $qrString,
+                            'qr_image_url' => $qrImageUrl,
+                        ];
+                    } else {
+                        throw new \Exception("Gagal meng-generate QRIS via Core API: " . $response->body());
+                    }
                 } else {
-                    throw new \Exception("Gagal mengambil token Midtrans Snap: " . $response->body());
+                    // VA / Transfer masih pakai SNAP
+                    $enabledPayments = ['bca_va', 'bni_va', 'bri_va', 'permata_va', 'cimb_va', 'other_va', 'echannel'];
+                    
+                    // Panggil API Midtrans SNAP
+                    $response = \Illuminate\Support\Facades\Http::withBasicAuth($serverKey, '')
+                        ->withHeaders([
+                            'X-Override-Notification' => url('/api/midtrans/webhook')
+                        ])
+                        ->post('https://app.sandbox.midtrans.com/snap/v1/transactions', [
+                            'transaction_details' => [
+                                'order_id' => $midtransOrderId,
+                                'gross_amount' => (int) $order->total
+                            ],
+                            'enabled_payments' => $enabledPayments
+                        ]);
+
+                    if ($response->successful()) {
+                        $snapData = $response->json();
+                        
+                        // Simpan ke database
+                        $order->midtrans_order_id = $midtransOrderId;
+                        $order->payment_token = $snapData['token'] ?? null;
+                        $order->save();
+
+                        $paymentDetails = [
+                            'transaction_id' => $midtransOrderId,
+                            'payment_type' => 'bank_transfer',
+                            'snap_token' => $snapData['token'] ?? null,
+                            'snap_redirect_url' => $snapData['redirect_url'] ?? null,
+                        ];
+                    } else {
+                        throw new \Exception("Gagal mengambil token Midtrans Snap: " . $response->body());
+                    }
                 }
             }
 
