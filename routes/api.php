@@ -26,6 +26,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('orders/hitung-total', [\App\Http\Controllers\Api\OrderController::class, 'calculateTotal']);
     Route::post('orders', [\App\Http\Controllers\Api\OrderController::class, 'store']);
     Route::get('orders', [\App\Http\Controllers\Api\OrderController::class, 'index']);
+    Route::get('orders/{id}/check-status', [\App\Http\Controllers\Api\OrderController::class, 'checkStatus']);
     Route::get('orders/{id}', [\App\Http\Controllers\Api\OrderController::class, 'show']);
     Route::delete('orders/{id}', [\App\Http\Controllers\Api\OrderController::class, 'destroy']);
 

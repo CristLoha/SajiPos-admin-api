@@ -21,6 +21,8 @@ class Order extends Model
         'tax',
         'total',
         'payment_method',
+        'midtrans_order_id',
+        'payment_token',
         'receipt_token',
         'status',
     ];

@@ -204,11 +204,15 @@ class OrderController extends Controller
                     $enabledPayments = ['bca_va', 'bni_va', 'bri_va', 'permata_va', 'cimb_va', 'other_va', 'echannel'];
                 }
                 
+                $midtransOrderId = $invoiceNumber . '-' . time();
                 // Panggil API Midtrans SNAP
                 $response = \Illuminate\Support\Facades\Http::withBasicAuth($serverKey, '')
+                    ->withHeaders([
+                        'X-Override-Notification' => url('/api/midtrans/webhook')
+                    ])
                     ->post('https://app.sandbox.midtrans.com/snap/v1/transactions', [
                         'transaction_details' => [
-                            'order_id' => $invoiceNumber . '-' . time(), // Tambah time() agar order_id unique saat retry
+                            'order_id' => $midtransOrderId, // Tambah time() agar order_id unique saat retry
                             'gross_amount' => (int) $order->total
                         ],
                         'enabled_payments' => $enabledPayments
@@ -216,8 +220,14 @@ class OrderController extends Controller
 
                 if ($response->successful()) {
                     $snapData = $response->json();
+                    
+                    // Simpan ke database
+                    $order->midtrans_order_id = $midtransOrderId;
+                    $order->payment_token = $snapData['token'] ?? null;
+                    $order->save();
+
                     $paymentDetails = [
-                        'transaction_id' => $invoiceNumber,
+                        'transaction_id' => $midtransOrderId,
                         'snap_token' => $snapData['token'] ?? null,
                         'snap_redirect_url' => $snapData['redirect_url'] ?? null,
                     ];
@@ -260,15 +270,92 @@ class OrderController extends Controller
      * Display a list of order history.
      * GET /api/orders
      */
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::with('items.product', 'cashier')->orderBy('created_at', 'desc')->get();
+        $query = Order::with('items.product', 'cashier')->orderBy('created_at', 'desc');
+
+        // Filter by cashier/user
+        if ($request->has('cashier_id')) {
+            $query->where('cashier_id', $request->cashier_id);
+        }
+
+        $orders = $query->get();
 
         return response()->json([
             'success' => true,
             'message' => 'List Riwayat Transaksi',
             'data' => $orders
         ], 200);
+    }
+
+    /**
+     * Cek status pembayaran Midtrans secara manual (Sync)
+     * GET /api/orders/{id}/check-status
+     */
+    public function checkStatus($id)
+    {
+        $order = Order::find($id);
+
+        if (!$order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pesanan tidak ditemukan'
+            ], 404);
+        }
+
+        if (!in_array(strtolower($order->payment_method), ['qris', 'transfer', 'bank_transfer'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pesanan ini tidak menggunakan metode pembayaran Midtrans'
+            ], 400);
+        }
+
+        if (!$order->midtrans_order_id) {
+            // Jika untuk data lama yang belum punya midtrans_order_id
+            return response()->json([
+                'success' => false,
+                'message' => 'Order ID Midtrans tidak ditemukan di database. Tidak bisa melakukan sync untuk transaksi lama.'
+            ], 400);
+        }
+
+        $serverKey = config('services.midtrans.server_key');
+        
+        // Panggil API Get Status Midtrans (Sandbox/Production tergantung URL)
+        // Kita gunakan sandbox sesuai implementasi SNAP sebelumnya
+        $response = \Illuminate\Support\Facades\Http::withBasicAuth($serverKey, '')
+            ->get("https://api.sandbox.midtrans.com/v2/{$order->midtrans_order_id}/status");
+
+        if ($response->successful()) {
+            $data = $response->json();
+            $transactionStatus = $data['transaction_status'] ?? 'pending';
+
+            if ($transactionStatus == 'capture' || $transactionStatus == 'settlement') {
+                $order->status = 'success';
+            } else if ($transactionStatus == 'cancel' || $transactionStatus == 'deny' || $transactionStatus == 'expire') {
+                $order->status = 'failed';
+            } else if ($transactionStatus == 'pending') {
+                $order->status = 'pending';
+            }
+
+            $order->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Status berhasil disinkronisasi',
+                'data' => [
+                    'order_id' => $order->id,
+                    'status' => $order->status,
+                    'midtrans_status' => $transactionStatus,
+                ]
+            ], 200);
+        }
+
+        // Jika tidak ditemukan di Midtrans (misalnya belum dibayar atau expire/terhapus)
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal mengecek status ke Midtrans',
+            'error' => $response->json()
+        ], 500);
     }
 
     /**
