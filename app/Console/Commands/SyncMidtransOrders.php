@@ -64,5 +64,16 @@ class SyncMidtransOrders extends Command
         }
 
         $this->info("Sinkronisasi selesai.");
+
+        // Bersihkan juga "Hantu Pending" masa lalu (pesanan sebelum fitur midtrans_order_id dibuat)
+        // yang umurnya sudah lebih dari 24 jam.
+        $legacyGhostOrders = Order::where('status', 'pending')
+            ->whereNull('midtrans_order_id')
+            ->where('created_at', '<=', Carbon::now()->subDays(1))
+            ->update(['status' => 'failed']);
+            
+        if ($legacyGhostOrders > 0) {
+            $this->info("Berhasil membersihkan {$legacyGhostOrders} pesanan hantu lama (tanpa Midtrans ID).");
+        }
     }
 }

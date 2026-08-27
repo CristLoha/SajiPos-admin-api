@@ -311,10 +311,27 @@ class OrderController extends Controller
         }
 
         if (!$order->midtrans_order_id) {
-            // Jika untuk data lama yang belum punya midtrans_order_id
+            // Jika untuk data lama yang belum punya midtrans_order_id (sebelum fitur ini dibuat)
+            // Kita tidak bisa mengecek ke Midtrans karena order_id Midtrans-nya mengandung timestamp yang tidak kita simpan.
+            // Solusi: Jika pesanan ini sudah lebih dari 24 jam, otomatis kita anggap failed/expired.
+            if ($order->created_at <= \Carbon\Carbon::now()->subDays(1)) {
+                $order->status = 'failed';
+                $order->save();
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Data lama (tanpa ID Midtrans) yang sudah kadaluarsa otomatis dibatalkan.',
+                    'data' => [
+                        'order_id' => $order->id,
+                        'status' => $order->status,
+                        'midtrans_status' => 'expire'
+                    ]
+                ], 200);
+            }
+
             return response()->json([
                 'success' => false,
-                'message' => 'Order ID Midtrans tidak ditemukan di database. Tidak bisa melakukan sync untuk transaksi lama.'
+                'message' => 'Order ID Midtrans tidak ditemukan di database. Tidak bisa melakukan sync untuk transaksi ini.'
             ], 400);
         }
 
