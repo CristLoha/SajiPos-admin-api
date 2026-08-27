@@ -16,14 +16,20 @@ class MidtransWebhookController extends Controller
 
         if ($hashed == $request->signature_key) {
             $orderIdFull = $request->order_id;
-            // Format order_id dari backend adalah ORD-0001-timestamp
-            $parts = explode('-', $orderIdFull);
             
-            if (count($parts) >= 2) {
-                $orderId = (int)$parts[1]; // Mengambil angka order ID-nya saja, misal '0001' menjadi 1
-                $order = Order::find($orderId);
+            // Coba cari berdasarkan midtrans_order_id yang baru (jika ada)
+            $order = Order::where('midtrans_order_id', $orderIdFull)->first();
+            
+            if (!$order) {
+                // Fallback untuk data lama: Format order_id dari backend adalah ORD-0001-timestamp
+                $parts = explode('-', $orderIdFull);
+                if (count($parts) >= 2) {
+                    $orderId = (int)$parts[1]; // Mengambil angka order ID-nya saja, misal '0001' menjadi 1
+                    $order = Order::find($orderId);
+                }
+            }
                 
-                if ($order) {
+            if ($order) {
                     if ($request->transaction_status == 'capture' || $request->transaction_status == 'settlement') {
                         $order->status = 'success';
                     } else if ($request->transaction_status == 'cancel' || $request->transaction_status == 'deny' || $request->transaction_status == 'expire') {
