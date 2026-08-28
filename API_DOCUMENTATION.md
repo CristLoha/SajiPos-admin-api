@@ -404,6 +404,14 @@ Menyimpan transaksi order beserta item produk yang dibeli.
         "payment_method": "qris",
         "created_at": "2026-06-07T13:47:37.000000Z",
         "updated_at": "2026-06-07T13:47:37.000000Z",
+        "order_id": 1,
+        "invoice_number": "ORD-0001",
+        "payment_details": {
+            "transaction_id": "ORD-0001-1718900000",
+            "payment_type": "qris",
+            "qr_string": "00020101021126670016ID.CO.Q... (Contoh String QR)",
+            "qr_image_url": null
+        },
         "items": [
             {
                 "id": 1,
@@ -423,7 +431,36 @@ Menyimpan transaksi order beserta item produk yang dibeli.
 }
 ```
 
-### B. GET List Riwayat Transaksi
+> ⚠️ **Catatan Integrasi Xendit (Payment Gateway):**
+> Mulai versi ini, Backend menggunakan **Xendit** sebagai payment gateway (menggantikan Midtrans).
+> - Jika `payment_method` adalah `"qris"`, field `payment_details.qr_string` akan berisi string standar QRIS. Frontend (Flutter) bertugas me-render string ini menjadi gambar QR Code secara mandiri (misal menggunakan library `qr_flutter`).
+> - Jika `payment_method` adalah `"transfer"` atau `"bank_transfer"`, Backend akan memanggil Xendit Invoices. Object `payment_details` akan mereturn `snap_redirect_url` (contoh: `https://checkout-staging.xendit.co/web/...`) yang bisa langsung dibuka oleh Flutter via WebView atau URL Launcher.
+
+### B. GET Cek Status Pembayaran (Sync)
+
+Mengecek status pembayaran pesanan secara realtime langsung ke Xendit (berlaku untuk QRIS dan Invoices). Biasanya dipanggil oleh Flutter secara _polling_ atau saat menekan tombol "Cek Status".
+
+-   **URL:** `/orders/{id}/check-status`
+-   **Method:** `GET`
+-   **Headers:**
+    -   `Authorization: Bearer <your-token>`
+-   **Auth Required:** Yes (Sanctum)
+
+#### 📥 Response (200 OK)
+
+```json
+{
+    "success": true,
+    "message": "Status berhasil disinkronisasi",
+    "data": {
+        "order_id": 1,
+        "status": "success",
+        "xendit_status": "COMPLETED"
+    }
+}
+```
+
+### C. GET List Riwayat Transaksi
 
 Mengambil semua riwayat transaksi kasir yang ada di sistem.
 
