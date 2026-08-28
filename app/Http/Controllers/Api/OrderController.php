@@ -195,93 +195,70 @@ class OrderController extends Controller
             $paymentMethod = strtolower($request->payment_method);
             if (in_array($paymentMethod, ['qris', 'transfer', 'bank_transfer'])) {
                 $invoiceNumber = 'ORD-' . str_pad($order->id, 4, '0', STR_PAD_LEFT);
-                $serverKey = config('services.midtrans.server_key');
-                $midtransOrderId = $invoiceNumber . '-' . time();
+                $secretKey = config('services.xendit.secret_key');
+                $externalId = $invoiceNumber . '-' . time();
                 
                 if ($paymentMethod === 'qris') {
-                    // Panggil API Midtrans CORE API khusus untuk QRIS
-                    $response = \Illuminate\Support\Facades\Http::withBasicAuth($serverKey, '')
+                    // Panggil API Xendit untuk QRIS
+                    $response = \Illuminate\Support\Facades\Http::withBasicAuth($secretKey, '')
                         ->withHeaders([
                             'Content-Type' => 'application/json',
-                            'Accept' => 'application/json',
-                            'X-Override-Notification' => url('/api/midtrans/webhook')
                         ])
-                        ->post('https://api.sandbox.midtrans.com/v2/charge', [
-                            'payment_type' => 'qris',
-                            'transaction_details' => [
-                                'order_id' => $midtransOrderId,
-                                'gross_amount' => (int) $order->total
-                            ],
-                            'qris' => [
-                                'acquirer' => 'gopay'
-                            ]
+                        ->post('https://api.xendit.co/qr_codes', [
+                            'reference_id' => $externalId,
+                            'type' => 'DYNAMIC',
+                            'currency' => 'IDR',
+                            'amount' => (int) $order->total,
                         ]);
 
                     if ($response->successful()) {
-                        $coreData = $response->json();
+                        $qrData = $response->json();
                         
-                        // Ekstrak QR String atau Image URL dari response
-                        $qrString = $coreData['qr_string'] ?? null;
+                        $qrString = $qrData['qr_string'] ?? null;
                         
-                        // Cari action url untuk gambar QRIS (opsional jika qr_string tidak mau digambar manual)
-                        $qrImageUrl = null;
-                        if (isset($coreData['actions']) && is_array($coreData['actions'])) {
-                            foreach ($coreData['actions'] as $action) {
-                                if ($action['name'] === 'generate-qr-code') {
-                                    $qrImageUrl = $action['url'];
-                                    break;
-                                }
-                            }
-                        }
-
                         // Simpan ke database
-                        $order->midtrans_order_id = $midtransOrderId;
-                        // Simpan qr_string ke payment_token (bisa di-reuse field-nya) atau biarkan kosong
+                        $order->midtrans_order_id = $externalId; // Tetap menggunakan kolom ini atau bisa diubah namanya
                         $order->payment_token = $qrString;
                         $order->save();
 
                         $paymentDetails = [
-                            'transaction_id' => $midtransOrderId,
+                            'transaction_id' => $externalId,
                             'payment_type' => 'qris',
                             'qr_string' => $qrString,
-                            'qr_image_url' => $qrImageUrl,
+                            'qr_image_url' => null, // Xendit tidak me-return image URL langsung
                         ];
                     } else {
-                        throw new \Exception("Gagal meng-generate QRIS via Core API: " . $response->body());
+                        throw new \Exception("Gagal meng-generate QRIS via Xendit: " . $response->body());
                     }
                 } else {
-                    // VA / Transfer masih pakai SNAP
-                    $enabledPayments = ['bca_va', 'bni_va', 'bri_va', 'permata_va', 'cimb_va', 'other_va', 'echannel'];
-                    
-                    // Panggil API Midtrans SNAP
-                    $response = \Illuminate\Support\Facades\Http::withBasicAuth($serverKey, '')
+                    // Panggil API Xendit Invoices untuk VA / Transfer
+                    $response = \Illuminate\Support\Facades\Http::withBasicAuth($secretKey, '')
                         ->withHeaders([
-                            'X-Override-Notification' => url('/api/midtrans/webhook')
+                            'Content-Type' => 'application/json',
                         ])
-                        ->post('https://app.sandbox.midtrans.com/snap/v1/transactions', [
-                            'transaction_details' => [
-                                'order_id' => $midtransOrderId,
-                                'gross_amount' => (int) $order->total
-                            ],
-                            'enabled_payments' => $enabledPayments
+                        ->post('https://api.xendit.co/v2/invoices', [
+                            'external_id' => $externalId,
+                            'amount' => (int) $order->total,
+                            'description' => 'Pembayaran pesanan ' . $invoiceNumber,
+                            'payment_methods' => ['VIRTUAL_ACCOUNT', 'BANK_TRANSFER'],
                         ]);
 
                     if ($response->successful()) {
-                        $snapData = $response->json();
+                        $invoiceData = $response->json();
                         
                         // Simpan ke database
-                        $order->midtrans_order_id = $midtransOrderId;
-                        $order->payment_token = $snapData['token'] ?? null;
+                        $order->midtrans_order_id = $externalId;
+                        $order->payment_token = $invoiceData['id'] ?? null; // Simpan invoice ID
                         $order->save();
 
                         $paymentDetails = [
-                            'transaction_id' => $midtransOrderId,
+                            'transaction_id' => $externalId,
                             'payment_type' => 'bank_transfer',
-                            'snap_token' => $snapData['token'] ?? null,
-                            'snap_redirect_url' => $snapData['redirect_url'] ?? null,
+                            'snap_token' => $invoiceData['id'] ?? null,
+                            'snap_redirect_url' => $invoiceData['invoice_url'] ?? null,
                         ];
                     } else {
-                        throw new \Exception("Gagal mengambil token Midtrans Snap: " . $response->body());
+                        throw new \Exception("Gagal membuat Invoice Xendit: " . $response->body());
                     }
                 }
             }
@@ -378,43 +355,81 @@ class OrderController extends Controller
             ], 200);
         }
 
-        $serverKey = config('services.midtrans.server_key');
+        $secretKey = config('services.xendit.secret_key');
         
-        // Panggil API Get Status Midtrans (Sandbox/Production tergantung URL)
-        // Kita gunakan sandbox sesuai implementasi SNAP sebelumnya
-        $response = \Illuminate\Support\Facades\Http::withBasicAuth($serverKey, '')
-            ->get("https://api.sandbox.midtrans.com/v2/{$order->midtrans_order_id}/status");
-
-        if ($response->successful()) {
-            $data = $response->json();
-            $transactionStatus = $data['transaction_status'] ?? 'pending';
-
-            if ($transactionStatus == 'capture' || $transactionStatus == 'settlement') {
-                $order->status = 'success';
-            } else if ($transactionStatus == 'cancel' || $transactionStatus == 'deny' || $transactionStatus == 'expire') {
-                $order->status = 'failed';
-            } else if ($transactionStatus == 'pending') {
-                $order->status = 'pending';
+        $paymentMethod = strtolower($order->payment_method);
+        
+        try {
+            if ($paymentMethod === 'qris') {
+                // Untuk QRIS, kita bisa cek dari Endpoint Xendit QR Codes menggunakan reference_id / external_id (midtrans_order_id)
+                $response = \Illuminate\Support\Facades\Http::withBasicAuth($secretKey, '')
+                    ->get("https://api.xendit.co/qr_codes/{$order->midtrans_order_id}");
+                
+                if ($response->successful()) {
+                    $data = $response->json();
+                    $transactionStatus = $data['status'] ?? 'PENDING';
+                    
+                    if ($transactionStatus == 'COMPLETED' || $transactionStatus == 'PAID') {
+                        $order->status = 'success';
+                    } else if ($transactionStatus == 'FAILED' || $transactionStatus == 'VOID') {
+                        $order->status = 'failed';
+                    } else {
+                        $order->status = 'pending';
+                    }
+                    
+                    $order->save();
+                    
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Status berhasil disinkronisasi',
+                        'data' => [
+                            'order_id' => $order->id,
+                            'status' => $order->status,
+                            'xendit_status' => $transactionStatus,
+                        ]
+                    ], 200);
+                }
+            } else {
+                // Untuk Transfer/VA, cek menggunakan Invoice ID yang disimpan di payment_token
+                $invoiceId = $order->payment_token;
+                if ($invoiceId) {
+                    $response = \Illuminate\Support\Facades\Http::withBasicAuth($secretKey, '')
+                        ->get("https://api.xendit.co/v2/invoices/{$invoiceId}");
+                        
+                    if ($response->successful()) {
+                        $data = $response->json();
+                        $transactionStatus = $data['status'] ?? 'PENDING';
+                        
+                        if ($transactionStatus == 'PAID' || $transactionStatus == 'SETTLED') {
+                            $order->status = 'success';
+                        } else if ($transactionStatus == 'EXPIRED') {
+                            $order->status = 'failed';
+                        } else {
+                            $order->status = 'pending';
+                        }
+                        
+                        $order->save();
+                        
+                        return response()->json([
+                            'success' => true,
+                            'message' => 'Status berhasil disinkronisasi',
+                            'data' => [
+                                'order_id' => $order->id,
+                                'status' => $order->status,
+                                'xendit_status' => $transactionStatus,
+                            ]
+                        ], 200);
+                    }
+                }
             }
-
-            $order->save();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Status berhasil disinkronisasi',
-                'data' => [
-                    'order_id' => $order->id,
-                    'status' => $order->status,
-                    'midtrans_status' => $transactionStatus,
-                ]
-            ], 200);
+        } catch (\Exception $e) {
+            // Lanjut ke bawah
         }
 
-        // Jika tidak ditemukan di Midtrans (misalnya belum dibayar atau expire/terhapus)
+        // Jika tidak ditemukan di Xendit
         return response()->json([
             'success' => false,
-            'message' => 'Gagal mengecek status ke Midtrans',
-            'error' => $response->json()
+            'message' => 'Gagal mengecek status ke Xendit',
         ], 500);
     }
 

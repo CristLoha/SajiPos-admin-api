@@ -79,5 +79,5 @@ Route::middleware('auth:sanctum')->group(function () {
 
 });
 
-// Midtrans Webhook (tidak butuh auth sanctum)
-Route::post('/midtrans/webhook', [\App\Http\Controllers\Api\MidtransWebhookController::class, 'handle']);
+// Xendit Webhook (tidak butuh auth sanctum)
+Route::post('/xendit/webhook', [\App\Http\Controllers\Api\XenditWebhookController::class, 'handle']);
