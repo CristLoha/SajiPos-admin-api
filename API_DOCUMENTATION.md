@@ -410,7 +410,8 @@ Menyimpan transaksi order beserta item produk yang dibeli.
             "transaction_id": "ORD-0001-1718900000",
             "payment_type": "qris",
             "qr_string": "00020101021126670016ID.CO.Q... (Contoh String QR)",
-            "qr_image_url": null
+            "qr_image_url": null,
+            "expires_at": "2026-08-28T17:16:42.000Z"
         },
         "items": [
             {

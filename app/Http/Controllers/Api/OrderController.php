@@ -226,6 +226,7 @@ class OrderController extends Controller
                             'payment_type' => 'qris',
                             'qr_string' => $qrString,
                             'qr_image_url' => null, // Xendit tidak me-return image URL langsung
+                            'expires_at' => $qrData['expires_at'] ?? null,
                         ];
                     } else {
                         throw new \Exception("Gagal meng-generate QRIS via Xendit: " . $response->body());
@@ -256,6 +257,7 @@ class OrderController extends Controller
                             'payment_type' => 'bank_transfer',
                             'snap_token' => $invoiceData['id'] ?? null,
                             'snap_redirect_url' => $invoiceData['invoice_url'] ?? null,
+                            'expires_at' => $invoiceData['expiry_date'] ?? null,
                         ];
                     } else {
                         throw new \Exception("Gagal membuat Invoice Xendit: " . $response->body());
