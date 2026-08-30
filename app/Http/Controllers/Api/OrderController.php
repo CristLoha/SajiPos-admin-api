@@ -188,8 +188,6 @@ class OrderController extends Controller
                 }
             }
 
-            DB::commit();
-
             $paymentDetails = null;
 
             $paymentMethod = strtolower($request->payment_method);
@@ -279,6 +277,8 @@ class OrderController extends Controller
             $responseData['tax_amount'] = $tax_amount;
             $responseData['discount_amount'] = $final_discount_amount;
             $responseData['grand_total'] = $calculated_total;
+
+            DB::commit();
 
             return response()->json([
                 'success' => true,
