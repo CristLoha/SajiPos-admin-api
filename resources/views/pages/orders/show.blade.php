@@ -47,6 +47,24 @@
                             </div>
                         </div>
 
+                        @if(strtolower($order->payment_method) === 'qris' && $order->payment_token)
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h4>Detail QRIS Xendit</h4>
+                            </div>
+                            <div class="card-body text-center">
+                                @php
+                                    $qrImageUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' . urlencode($order->payment_token);
+                                @endphp
+                                <img src="{{ $qrImageUrl }}" alt="QRIS Code" class="img-fluid rounded mb-3" style="border: 2px solid #eaeaea; padding: 10px; max-width: 250px;">
+                                <p class="text-muted mb-0" style="font-size: 12px; word-break: break-all;">
+                                    <strong>QR String:</strong><br>
+                                    {{ $order->payment_token }}
+                                </p>
+                            </div>
+                        </div>
+                        @endif
+
                         <div class="card mt-3">
                             <div class="card-header">
                                 <h4>Rincian Biaya</h4>
