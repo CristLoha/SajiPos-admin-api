@@ -85,6 +85,7 @@
                                                 <th style="min-width: 120px;">Pajak</th>
                                                 <th style="min-width: 140px;">Total Akhir</th>
                                                 <th class="text-center" style="min-width: 130px;">Pembayaran</th>
+                                                <th class="text-center" style="min-width: 110px;">Status</th>
                                                 <th class="text-center sticky-action" style="min-width: 120px;">Aksi</th>
                                             </tr>
                                         </thead>
@@ -111,6 +112,15 @@
                                                             {{ $order->payment_method }}
                                                         </span>
                                                     </td>
+                                                    <td class="text-center">
+                                                        @if (strtolower($order->status) == 'success')
+                                                            <span class="badge badge-success">Sukses</span>
+                                                        @elseif (strtolower($order->status) == 'pending')
+                                                            <span class="badge badge-warning">Tertunda</span>
+                                                        @else
+                                                            <span class="badge badge-danger">Batal</span>
+                                                        @endif
+                                                    </td>
                                                     <td class="text-center sticky-action">
                                                         <a href="{{ route('orders.show', $order->id) }}"
                                                             class="btn btn-sm btn-primary"
@@ -121,7 +131,7 @@
                                                 </tr>
                                             @empty
                                                 <tr>
-                                                    <td colspan="13" class="text-center text-muted py-4">
+                                                    <td colspan="14" class="text-center text-muted py-4">
                                                         <i class="fas fa-history fa-2x mb-2 d-block" style="opacity: 0.3;"></i>
                                                         Tidak ditemukan data transaksi.
                                                     </td>
