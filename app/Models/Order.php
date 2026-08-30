@@ -39,12 +39,14 @@ class Order extends Model
                 'payment_type' => 'qris',
                 'qr_string' => $this->payment_token,
                 'qr_image_url' => $this->payment_token ? 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($this->payment_token) : null,
+                'expires_at' => $this->created_at ? $this->created_at->copy()->addDays(2)->toIso8601ZuluString() : null,
             ];
         } elseif (in_array($paymentMethod, ['transfer', 'bank_transfer'])) {
             return [
                 'transaction_id' => $this->midtrans_order_id,
                 'payment_type' => 'bank_transfer',
                 'snap_token' => $this->payment_token,
+                'expires_at' => $this->created_at ? $this->created_at->copy()->addDays(1)->toIso8601ZuluString() : null,
             ];
         }
 
