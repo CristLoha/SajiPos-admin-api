@@ -78,11 +78,6 @@
                                                 <th style="min-width: 130px;">No Order</th>
                                                 <th style="min-width: 160px;">Waktu Transaksi</th>
                                                 <th style="min-width: 150px;">Kasir</th>
-                                                <th style="min-width: 120px;">Subtotal</th>
-                                                <th style="min-width: 120px;">Diskon</th>
-                                                <th style="min-width: 120px;">Ongkir</th>
-                                                <th style="min-width: 120px;">Svc Charge</th>
-                                                <th style="min-width: 120px;">Pajak</th>
                                                 <th style="min-width: 140px;">Total Akhir</th>
                                                 <th class="text-center" style="min-width: 130px;">Pembayaran</th>
                                                 <th class="text-center" style="min-width: 110px;">Status</th>
@@ -99,13 +94,6 @@
                                                     <td><strong>#ORD-{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}</strong></td>
                                                     <td>{{ \Carbon\Carbon::parse($order->transaction_time)->format('d M Y H:i') }}</td>
                                                     <td>{{ $order->cashier->name ?? '-' }}</td>
-                                                    <td>Rp {{ number_format($order->sub_total, 0, ',', '.') }}</td>
-                                                    <td class="{{ $order->discount_amount > 0 ? 'text-danger' : 'text-muted' }}">
-                                                        {{ $order->discount_amount > 0 ? '-Rp ' : 'Rp ' }}{{ number_format($order->discount_amount, 0, ',', '.') }}
-                                                    </td>
-                                                    <td>Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</td>
-                                                    <td>Rp {{ number_format($order->service_charge, 0, ',', '.') }}</td>
-                                                    <td>Rp {{ number_format($order->tax, 0, ',', '.') }}</td>
                                                     <td><strong class="text-success">Rp {{ number_format($order->total, 0, ',', '.') }}</strong></td>
                                                     <td class="text-center">
                                                         <span class="badge badge-light" style="border: 1px solid var(--sp-border); text-transform: uppercase;">
@@ -131,7 +119,7 @@
                                                 </tr>
                                             @empty
                                                 <tr>
-                                                    <td colspan="14" class="text-center text-muted py-4">
+                                                    <td colspan="9" class="text-center text-muted py-4">
                                                         <i class="fas fa-history fa-2x mb-2 d-block" style="opacity: 0.3;"></i>
                                                         Tidak ditemukan data transaksi.
                                                     </td>
