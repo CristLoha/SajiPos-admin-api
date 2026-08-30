@@ -6,6 +6,14 @@
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no"
         name="viewport">
     <title>@yield('title') &mdash; SajiPOS</title>
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="SajiPOS - Aplikasi Point of Sale (POS) terbaik untuk restoran, kafe, dan bisnis kuliner Anda. Kelola transaksi dan laporan dengan mudah.">
+    <meta name="keywords" content="POS restoran, aplikasi kasir, kasir kafe, aplikasi POS terbaik, SajiPOS, sistem kasir">
+    <meta name="author" content="SajiPOS">
+    <meta property="og:title" content="SajiPOS - Aplikasi Kasir Restoran Modern">
+    <meta property="og:description" content="Kelola bisnis kuliner Anda dengan SajiPOS. Aplikasi kasir modern untuk kelancaran transaksi restoran dan kafe.">
+    <meta property="og:type" content="website">
+    <meta name="robots" content="index, follow">
     <!-- Favicon Sendok -->
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}" />
     <!-- General CSS Files -->

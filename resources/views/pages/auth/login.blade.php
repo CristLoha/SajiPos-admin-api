@@ -5,11 +5,11 @@
 @section('main')
     <div class="card card-primary">
         <div class="card-header">
-            <h4>Masuk ke SajiPOS</h4>
+            <h1 style="font-size: 1.1rem; margin: 0; color: #34395e; font-weight: 700; display: inline-block;">Masuk ke SajiPOS</h1>
         </div>
 
         <div class="card-body">
-            <p class="text-muted mb-4">Silakan masuk untuk mengakses dashboard restoran Anda</p>
+            <h2 class="text-muted mb-4" style="font-size: 1rem; font-weight: 400; margin-top: 0;">Silakan masuk untuk mengakses dashboard restoran Anda</h2>
 
             <form method="POST" action="{{ route('login') }}" class="needs-validation" novalidate="">
                 @csrf

@@ -203,6 +203,7 @@ class OrderController extends Controller
                     $response = \Illuminate\Support\Facades\Http::withBasicAuth($secretKey, '')
                         ->withHeaders([
                             'Content-Type' => 'application/json',
+                            'api-version' => '2022-07-31'
                         ])
                         ->post('https://api.xendit.co/qr_codes', [
                             'reference_id' => $externalId,
