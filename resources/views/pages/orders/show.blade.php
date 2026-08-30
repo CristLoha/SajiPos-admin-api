@@ -57,9 +57,16 @@
                                     $qrImageUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' . urlencode($order->payment_token);
                                 @endphp
                                 <img src="{{ $qrImageUrl }}" alt="QRIS Code" class="img-fluid rounded mb-3" style="border: 2px solid #eaeaea; padding: 10px; max-width: 250px;">
-                                <p class="text-muted mb-0" style="font-size: 12px; word-break: break-all;">
+                                <p class="text-muted mb-1" style="font-size: 12px; word-break: break-all;">
                                     <strong>QR String:</strong><br>
                                     {{ $order->payment_token }}
+                                    @if($order->payment_token === 'some-random-qr-string')
+                                        <br><span class="text-warning"><i class="fas fa-exclamation-triangle"></i> Ini adalah QR Testing dari Xendit (Mode Sandbox).</span>
+                                    @endif
+                                </p>
+                                <p class="text-danger mb-0" style="font-size: 13px; font-weight: bold;">
+                                    <i class="fas fa-clock"></i> Berlaku hingga:<br>
+                                    {{ \Carbon\Carbon::parse($order->created_at)->addDays(2)->format('d M Y H:i:s') }}
                                 </p>
                             </div>
                         </div>
