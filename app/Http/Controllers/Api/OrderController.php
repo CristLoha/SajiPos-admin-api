@@ -226,7 +226,7 @@ class OrderController extends Controller
                             'transaction_id' => $externalId,
                             'payment_type' => 'qris',
                             'qr_string' => $qrString,
-                            'qr_image_url' => null, // Xendit tidak me-return image URL langsung
+                            'qr_image_url' => $qrString ? 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($qrString) : null,
                             'expires_at' => $qrData['expires_at'] ?? null,
                         ];
                     } else {
