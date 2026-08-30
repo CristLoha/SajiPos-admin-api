@@ -389,6 +389,7 @@ class OrderController extends Controller
                             'order_id' => $order->id,
                             'status' => $order->status,
                             'xendit_status' => $transactionStatus,
+                            'payment_details' => $order->payment_details,
                         ]
                     ], 200);
                 }
@@ -420,6 +421,7 @@ class OrderController extends Controller
                                 'order_id' => $order->id,
                                 'status' => $order->status,
                                 'xendit_status' => $transactionStatus,
+                                'payment_details' => $order->payment_details,
                             ]
                         ], 200);
                     }
