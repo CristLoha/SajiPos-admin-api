@@ -63,6 +63,8 @@
                                 <h4>Detail QRIS Xendit</h4>
                             </div>
                             <div class="card-body text-center">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="Logo QRIS" style="height: 35px; margin-bottom: 15px;">
+                                <br>
                                 @php
                                     $qrImageUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' . urlencode($order->payment_token);
                                 @endphp
