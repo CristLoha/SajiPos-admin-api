@@ -43,6 +43,16 @@
                                         <span class="text-muted">Metode Bayar</span>
                                         <strong class="text-uppercase">{{ $order->payment_method }}</strong>
                                     </li>
+                                    <li class="list-group-item d-flex justify-content-between px-0">
+                                        <span class="text-muted">Status</span>
+                                        @if (strtolower($order->status) == 'success')
+                                            <span class="badge badge-success">Sukses</span>
+                                        @elseif (strtolower($order->status) == 'pending')
+                                            <span class="badge badge-warning">Tertunda</span>
+                                        @else
+                                            <span class="badge badge-danger">Batal</span>
+                                        @endif
+                                    </li>
                                 </ul>
                             </div>
                         </div>
