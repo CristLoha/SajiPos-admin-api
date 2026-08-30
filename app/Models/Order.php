@@ -39,7 +39,7 @@ class Order extends Model
                 'payment_type' => 'qris',
                 'qr_string' => $this->payment_token,
                 'qr_image_url' => $this->payment_token ? 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($this->payment_token) : null,
-                'expires_at' => $this->created_at ? $this->created_at->copy()->addDays(2)->toIso8601ZuluString() : null,
+                'expires_at' => $this->created_at ? $this->created_at->copy()->addMinutes(30)->toIso8601ZuluString() : null,
             ];
         } elseif (in_array($paymentMethod, ['transfer', 'bank_transfer'])) {
             // Kita construct invoice_url berdasarkan ID invoice yang tersimpan di payment_token
@@ -53,7 +53,7 @@ class Order extends Model
                 'payment_type' => 'bank_transfer',
                 'snap_token' => $invoiceId,
                 'snap_redirect_url' => $invoiceUrl,
-                'expires_at' => $this->created_at ? $this->created_at->copy()->addDays(1)->toIso8601ZuluString() : null,
+                'expires_at' => $this->created_at ? $this->created_at->copy()->addMinutes(30)->toIso8601ZuluString() : null,
             ];
         }
 

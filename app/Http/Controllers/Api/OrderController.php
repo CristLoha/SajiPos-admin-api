@@ -208,6 +208,7 @@ class OrderController extends Controller
                             'type' => 'DYNAMIC',
                             'currency' => 'IDR',
                             'amount' => (int) $order->total,
+                            'expires_at' => now()->addMinutes(30)->toIso8601ZuluString(),
                         ]);
 
                     if ($response->successful()) {
@@ -241,6 +242,7 @@ class OrderController extends Controller
                             'amount' => (int) $order->total,
                             'description' => 'Pembayaran pesanan ' . $invoiceNumber,
                             'payment_methods' => ['VIRTUAL_ACCOUNT', 'BANK_TRANSFER'],
+                            'invoice_duration' => 1800, // 30 menit dalam detik
                         ]);
 
                     if ($response->successful()) {

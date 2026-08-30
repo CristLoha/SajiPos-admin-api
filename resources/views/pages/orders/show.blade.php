@@ -78,7 +78,7 @@
                                 </p>
                                 <p class="text-danger mb-0" style="font-size: 13px; font-weight: bold;">
                                     <i class="fas fa-clock"></i> Berlaku hingga:<br>
-                                    {{ \Carbon\Carbon::parse($order->created_at)->addDays(2)->format('d M Y H:i:s') }}
+                                    {{ \Carbon\Carbon::parse($order->created_at)->addMinutes(30)->format('d M Y H:i:s') }}
                                 </p>
                             </div>
                         </div>
