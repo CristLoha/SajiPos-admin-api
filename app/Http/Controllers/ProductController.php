@@ -68,14 +68,27 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
         ]);
 
         $data = $request->only(['category_id', 'name', 'description', 'price', 'stock']);
 
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('products', 'public');
-            $data['image'] = $imagePath;
+            $file = $request->file('image');
+            $filename = uniqid() . '_' . time() . '.jpg';
+            $path = storage_path('app/public/products');
+            
+            if (!file_exists($path)) {
+                mkdir($path, 0755, true);
+            }
+
+            $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+            $image = $manager->read($file->getRealPath());
+            
+            $image->scaleDown(width: 800);
+            $image->toJpeg(85)->save($path . '/' . $filename);
+
+            $data['image'] = 'products/' . $filename;
         }
 
         Product::create($data);
@@ -116,7 +129,7 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
         ]);
 
         $product = Product::findOrFail($id);
@@ -133,8 +146,21 @@ class ProductController extends Controller
                 Storage::disk('public')->delete($product->image);
             }
             
-            $imagePath = $request->file('image')->store('products', 'public');
-            $product->image = $imagePath;
+            $file = $request->file('image');
+            $filename = uniqid() . '_' . time() . '.jpg';
+            $path = storage_path('app/public/products');
+            
+            if (!file_exists($path)) {
+                mkdir($path, 0755, true);
+            }
+
+            $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+            $image = $manager->read($file->getRealPath());
+            
+            $image->scaleDown(width: 800);
+            $image->toJpeg(85)->save($path . '/' . $filename);
+
+            $product->image = 'products/' . $filename;
         }
 
         $product->save();
