@@ -87,9 +87,9 @@ Mengambil seluruh daftar kategori produk makanan & minuman yang terdaftar di sis
 -   **Auth Required:** Yes (Sanctum)
 -   **Query Parameters:**
 
-| Parameter | Tipe | Wajib | Deskripsi |
-| :--- | :--- | :--- | :--- |
-| `name` | `string` | ❌ Tidak | Pencarian spesifik berdasarkan nama kategori. |
+| Parameter | Tipe     | Wajib    | Deskripsi                                     |
+| :-------- | :------- | :------- | :-------------------------------------------- |
+| `name`    | `string` | ❌ Tidak | Pencarian spesifik berdasarkan nama kategori. |
 
 ### 📥 Response (200 OK)
 
@@ -136,11 +136,11 @@ Mengambil seluruh daftar produk aktif. Mendukung filter pencarian menggunakan qu
 -   **Auth Required:** Yes (Sanctum)
 -   **Query Parameters:**
 
-| Parameter | Tipe | Wajib | Deskripsi |
-| :--- | :--- | :--- | :--- |
-| `search` | `string` | ❌ Tidak | Pencarian berdasarkan nama atau deskripsi produk. |
-| `name` | `string` | ❌ Tidak | Pencarian spesifik berdasarkan nama produk saja. |
-| `category_id` | `integer` | ❌ Tidak | Filter produk berdasarkan ID kategori. |
+| Parameter     | Tipe      | Wajib    | Deskripsi                                         |
+| :------------ | :-------- | :------- | :------------------------------------------------ |
+| `search`      | `string`  | ❌ Tidak | Pencarian berdasarkan nama atau deskripsi produk. |
+| `name`        | `string`  | ❌ Tidak | Pencarian spesifik berdasarkan nama produk saja.  |
+| `category_id` | `integer` | ❌ Tidak | Filter produk berdasarkan ID kategori.            |
 
 #### 📥 Response (200 OK)
 
@@ -239,11 +239,11 @@ Mengambil daftar diskon dengan dukungan filter status dan pencarian. Secara defa
     -   `Authorization: Bearer <your-token>`
 -   **Auth Required:** Yes (Sanctum)
 -   **Query Parameters:**
- 
- | Parameter | Tipe | Wajib | Deskripsi |
- | :--- | :--- | :--- | :--- |
- | `status` | `string` | ❌ Tidak | Filter status: `active`, `upcoming`, atau `expired`. |
- | `search` | `string` | ❌ Tidak | Pencarian berdasarkan nama promo atau kode. |
+
+| Parameter | Tipe     | Wajib    | Deskripsi                                            |
+| :-------- | :------- | :------- | :--------------------------------------------------- |
+| `status`  | `string` | ❌ Tidak | Filter status: `active`, `upcoming`, atau `expired`. |
+| `search`  | `string` | ❌ Tidak | Pencarian berdasarkan nama promo atau kode.          |
 
 > _Catatan: Field `status` pada response adalah hasil kalkulasi dinamis oleh sistem berdasarkan tanggal hari ini dibandingkan dengan `start_date` dan `expired_date`._
 
@@ -275,6 +275,7 @@ Mengambil daftar diskon dengan dukungan filter status dan pencarian. Secara defa
 ```
 
 > ⚠️ **Penting untuk Frontend (Flutter):**
+>
 > 1. Jika keranjang belanja kurang dari `min_transaction`, diskon tidak boleh digunakan.
 > 2. Jika tipe diskon adalah `percentage`, hasil potongan tidak boleh melebihi nilai `max_discount` (jika tidak null).
 > 3. Field `data` akan mengembalikan list kosong `[]` (bukan null) jika tidak ada diskon yang aktif.
@@ -434,8 +435,9 @@ Menyimpan transaksi order beserta item produk yang dibeli.
 
 > ⚠️ **Catatan Integrasi Xendit (Payment Gateway):**
 > Mulai versi ini, Backend menggunakan **Xendit** sebagai payment gateway (menggantikan Midtrans).
-> - Jika `payment_method` adalah `"qris"`, field `payment_details.qr_string` akan berisi string standar QRIS. Frontend (Flutter) bertugas me-render string ini menjadi gambar QR Code secara mandiri (misal menggunakan library `qr_flutter`).
-> - Jika `payment_method` adalah `"transfer"` atau `"bank_transfer"`, Backend akan memanggil Xendit Invoices. Object `payment_details` akan mereturn `snap_redirect_url` (contoh: `https://checkout-staging.xendit.co/web/...`) yang bisa langsung dibuka oleh Flutter via WebView atau URL Launcher.
+>
+> -   Jika `payment_method` adalah `"qris"`, field `payment_details.qr_string` akan berisi string standar QRIS. Frontend (Flutter) bertugas me-render string ini menjadi gambar QR Code secara mandiri (misal menggunakan library `qr_flutter`).
+> -   Jika `payment_method` adalah `"transfer"` atau `"bank_transfer"`, Backend akan memanggil Xendit Invoices. Object `payment_details` akan mereturn `snap_redirect_url` (contoh: `https://checkout-staging.xendit.co/web/...`) yang bisa langsung dibuka oleh Flutter via WebView atau URL Launcher.
 
 ### B. GET Cek Status Pembayaran (Sync)
 
@@ -549,7 +551,7 @@ Mengambil daftar promo/campaign khusus yang sedang aktif beserta daftar produk y
 
 ### A. GET List Campaign Aktif
 
-Mengambil semua campaign yang sedang aktif (`is_active = true`), dan berada dalam rentang tanggal saat ini (`start_date <= now <= end_date`). 
+Mengambil semua campaign yang sedang aktif (`is_active = true`), dan berada dalam rentang tanggal saat ini (`start_date <= now <= end_date`).
 
 -   **URL:** `/campaigns`
 -   **Method:** `GET`
@@ -570,7 +572,7 @@ Mengambil semua campaign yang sedang aktif (`is_active = true`), dan berada dala
             "start_date": "2026-08-01 00:00:00",
             "end_date": "2026-08-31 23:59:59",
             "discount_type": "percentage",
-            "discount_value": 17.00,
+            "discount_value": 17.0,
             "is_active": 1,
             "created_at": "2026-07-01T10:00:00.000000Z",
             "updated_at": "2026-07-01T10:00:00.000000Z",
@@ -612,7 +614,7 @@ Mengambil detail dari sebuah campaign berdasarkan ID, beserta produk-produk yang
         "start_date": "2026-08-01 00:00:00",
         "end_date": "2026-08-31 23:59:59",
         "discount_type": "percentage",
-        "discount_value": 17.00,
+        "discount_value": 17.0,
         "is_active": 1,
         "created_at": "2026-07-01T10:00:00.000000Z",
         "updated_at": "2026-07-01T10:00:00.000000Z",
@@ -657,37 +659,37 @@ Mengambil daftar transaksi harian yang baru saja dilakukan oleh kasir. Mendukung
     -   `Authorization: Bearer <your-token>`
 -   **Auth Required:** Yes (Sanctum)
 -   **Query Parameters:**
- 
- | Parameter | Tipe | Wajib | Deskripsi |
- | :--- | :--- | :--- | :--- |
- | `date` | `string` | ❌ Tidak | Filter transaksi berdasarkan tanggal (format `YYYY-MM-DD`). Default: hari ini. |
- | `page` | `integer` | ❌ Tidak | Nomor halaman untuk *pagination*. |
- | `limit` | `integer` | ❌ Tidak | Jumlah item per halaman. Default: 15. |
+
+| Parameter | Tipe      | Wajib    | Deskripsi                                                                      |
+| :-------- | :-------- | :------- | :----------------------------------------------------------------------------- |
+| `date`    | `string`  | ❌ Tidak | Filter transaksi berdasarkan tanggal (format `YYYY-MM-DD`). Default: hari ini. |
+| `page`    | `integer` | ❌ Tidak | Nomor halaman untuk _pagination_.                                              |
+| `limit`   | `integer` | ❌ Tidak | Jumlah item per halaman. Default: 15.                                          |
 
 #### 📥 Response (200 OK)
 
 ```json
 {
-  "status": "success",
-  "message": "Berhasil mengambil riwayat transaksi",
-  "data": {
-    "transactions": [
-      {
-        "id": "TRX-20260722-0001",
-        "time": "11:45:00",
-        "customer_name": "Customer",
-        "payment_method": "QRIS",
-        "total_items": 3,
-        "grand_total": 75000,
-        "status": "completed"
-      }
-    ],
-    "pagination": {
-      "current_page": 1,
-      "total_pages": 5,
-      "total_items": 45
+    "status": "success",
+    "message": "Berhasil mengambil riwayat transaksi",
+    "data": {
+        "transactions": [
+            {
+                "id": "TRX-20260722-0001",
+                "time": "11:45:00",
+                "customer_name": "Customer",
+                "payment_method": "QRIS",
+                "total_items": 3,
+                "grand_total": 75000,
+                "status": "completed"
+            }
+        ],
+        "pagination": {
+            "current_page": 1,
+            "total_pages": 5,
+            "total_items": 45
+        }
     }
-  }
 }
 ```
 
@@ -698,6 +700,7 @@ Mengambil daftar transaksi harian yang baru saja dilakukan oleh kasir. Mendukung
 Mengelola pengaturan profil toko (untuk cetak struk) dan pengaturan perhitungan biaya (ongkir, layanan, pajak).
 
 ### A. GET Profil Toko (Struk)
+
 Mengambil informasi nama toko, nomor telepon, alamat, dan preferensi tampilan struk.
 
 -   **URL:** `/settings/store`
@@ -707,6 +710,7 @@ Mengambil informasi nama toko, nomor telepon, alamat, dan preferensi tampilan st
 -   **Auth Required:** Yes (Sanctum)
 
 #### 📥 Response (200 OK)
+
 ```json
 {
     "success": true,
@@ -724,6 +728,7 @@ Mengambil informasi nama toko, nomor telepon, alamat, dan preferensi tampilan st
 ```
 
 ### B. PUT Update Profil Toko (Struk)
+
 Menyimpan perubahan informasi profil toko dan preferensi struk.
 
 -   **URL:** `/settings/store`
@@ -734,6 +739,7 @@ Menyimpan perubahan informasi profil toko dan preferensi struk.
 -   **Auth Required:** Yes (Sanctum)
 
 #### 📤 Request Body (JSON)
+
 ```json
 {
     "name": "SajiPos",
@@ -746,9 +752,11 @@ Menyimpan perubahan informasi profil toko dan preferensi struk.
 ```
 
 #### 📥 Response (200 OK)
+
 Akan mengembalikan response JSON yang sama dengan endpoint `GET /settings/store`.
 
 ### C. GET Pengaturan Perhitungan Biaya
+
 Mengambil pengaturan biaya yang sedang aktif.
 
 -   **URL:** `/settings/cost-calculation`
@@ -758,6 +766,7 @@ Mengambil pengaturan biaya yang sedang aktif.
 -   **Auth Required:** Yes (Sanctum)
 
 #### 📥 Response (200 OK)
+
 ```json
 {
     "success": true,
@@ -773,6 +782,7 @@ Mengambil pengaturan biaya yang sedang aktif.
 ```
 
 ### D. PUT Update Pengaturan Perhitungan Biaya
+
 Menyimpan perubahan pengaturan biaya.
 
 -   **URL:** `/settings/cost-calculation`
@@ -783,6 +793,7 @@ Menyimpan perubahan pengaturan biaya.
 -   **Auth Required:** Yes (Sanctum)
 
 #### 📤 Request Body (JSON)
+
 ```json
 {
     "shipping_fee": 10000,
@@ -794,6 +805,7 @@ Menyimpan perubahan pengaturan biaya.
 ```
 
 #### 📥 Response (200 OK)
+
 ```json
 {
     "success": true,
@@ -815,6 +827,7 @@ Menyimpan perubahan pengaturan biaya.
 Mengambil data statistik penjualan untuk ditampilkan di aplikasi kasir atau dashboard frontend.
 
 ### A. GET Menu Terlaris (Top Menus)
+
 Mengambil daftar menu paling laris secara keseluruhan (berdasarkan total kuantitas yang terjual).
 
 -   **URL:** `/menu-terlaris`
@@ -824,6 +837,7 @@ Mengambil daftar menu paling laris secara keseluruhan (berdasarkan total kuantit
 -   **Auth Required:** Yes (Sanctum)
 
 #### 📥 Response (200 OK)
+
 ```json
 {
     "success": true,
@@ -839,6 +853,7 @@ Mengambil daftar menu paling laris secara keseluruhan (berdasarkan total kuantit
 ```
 
 ### B. GET Menu Terlaris Harian (Daily Top Menus)
+
 Mengambil daftar menu paling laris khusus untuk hari ini saja.
 
 -   **URL:** `/menu-terlaris/harian`
@@ -848,6 +863,7 @@ Mengambil daftar menu paling laris khusus untuk hari ini saja.
 -   **Auth Required:** Yes (Sanctum)
 
 #### 📥 Response (200 OK)
+
 Format response sama seperti endpoint Menu Terlaris di atas, namun difilter untuk transaksi hari ini.
 
 ---
@@ -855,6 +871,7 @@ Format response sama seperti endpoint Menu Terlaris di atas, namun difilter untu
 ## 9. 🛠️ API Utilitas Tambahan
 
 ### A. GET Validasi Kode Diskon (Check Code)
+
 Mengecek apakah sebuah kode diskon/promo valid dan bisa digunakan oleh kasir.
 
 -   **URL:** `/discounts/check-code?code=WCB20`
@@ -864,9 +881,11 @@ Mengecek apakah sebuah kode diskon/promo valid dan bisa digunakan oleh kasir.
 -   **Auth Required:** Yes (Sanctum)
 
 #### 📥 Response (200 OK - Jika Valid)
+
 Akan mengembalikan detail objek diskon yang bersangkutan.
 
 #### 📥 Response (404 Not Found - Jika Invalid)
+
 ```json
 {
     "success": false,
@@ -875,6 +894,7 @@ Akan mengembalikan detail objek diskon yang bersangkutan.
 ```
 
 ### B. POST Kalkulasi Total Belanja (Hitung Total)
+
 Mengirimkan rincian keranjang belanja ke server untuk dikalkulasikan total akhirnya (termasuk pajak, layanan, ongkir, dan diskon) sebelum kasir melakukan proses Checkout/Bayar sesungguhnya.
 
 -   **URL:** `/orders/hitung-total`
@@ -885,6 +905,7 @@ Mengirimkan rincian keranjang belanja ke server untuk dikalkulasikan total akhir
 -   **Auth Required:** Yes (Sanctum)
 
 #### 📤 Request Body (JSON)
+
 Format data sama persis dengan **POST Simpan Transaksi Baru** (hanya data order/items-nya saja).
 
 ## 7. 📢 Integrasi Push Notification (FCM Broadcast)
@@ -897,9 +918,10 @@ Agar pelanggan dapat menerima notifikasi promo, pastikan aplikasi mobile melakuk
 
 **1. Subscribe ke Topic FCM**
 Saat aplikasi dibuka atau pelanggan berhasil _login_, aplikasi wajib melakukan subscribe ke topik berikut:
-- **Nama Topic:** `promo_broadcast`
 
-*(Contoh kode pada Flutter: `await FirebaseMessaging.instance.subscribeToTopic("promo_broadcast");`)*
+-   **Nama Topic:** `promo_broadcast`
+
+_(Contoh kode pada Flutter: `await FirebaseMessaging.instance.subscribeToTopic("promo_broadcast");`)_
 
 **2. Struktur Data Payload (Data Tersembunyi)**
 Ketika pelanggan meng-klik notifikasi promo yang masuk, backend SajiPOS sudah menyisipkan data ekstra (payload) di dalam push notification tersebut dengan format JSON berikut:
@@ -913,4 +935,4 @@ Ketika pelanggan meng-klik notifikasi promo yang masuk, backend SajiPOS sudah me
 
 **3. Aksi Navigasi (Routing & Fetch Data)**
 Frontend dapat mem-parsing data payload tersebut. Jika `action` bernilai `"open_promo"`, maka Frontend bisa otomatis mengarahkan pelanggan ke layar/halaman **Detail Promo**, lalu mengambil data lengkap promo tersebut dengan melakukan request HTTP ke:
-👉 `GET /api/campaigns/{id}` *(gunakan `campaign_id` dari payload)*.
+👉 `GET /api/campaigns/{id}` _(gunakan `campaign_id` dari payload)_.

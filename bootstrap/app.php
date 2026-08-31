@@ -29,4 +29,22 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], 429);
             }
         });
+
+        // Tambahkan fallback untuk semua error 500 di API agar user-friendly
+        $exceptions->render(function (\Throwable $e, Request $request) {
+            if ($request->is('api/*')) {
+                // Biarkan Exception bawaan Laravel (seperti 404, 422, 401) ditangani seperti biasa
+                if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface || 
+                    $e instanceof \Illuminate\Validation\ValidationException || 
+                    $e instanceof \Illuminate\Auth\AuthenticationException) {
+                    return null; // Biarkan default handler laravel yang urus
+                }
+
+                // Untuk error lainnya (misal DB error, syntax error, dll), kita sembunyikan detailnya
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Oops, server sedang bermasalah atau sedang dalam perbaikan. Coba lagi nanti ya!'
+                ], 500);
+            }
+        });
     })->create();
