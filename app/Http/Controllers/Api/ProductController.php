@@ -72,7 +72,7 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5120', // Dinaikin batasnya karena bakal dikompres di backend
             'status' => 'boolean',
             'is_best_seller' => 'boolean',
         ]);
@@ -80,8 +80,24 @@ class ProductController extends Controller
         $data = $request->except('image');
 
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('products', 'public');
-            $data['image'] = $imagePath;
+            $file = $request->file('image');
+            $filename = uniqid() . '_' . time() . '.jpg'; // Selalu simpan sebagai JPG agar ukurannya kecil
+            $path = storage_path('app/public/products');
+            
+            // Buat folder jika belum ada
+            if (!file_exists($path)) {
+                mkdir($path, 0755, true);
+            }
+
+            // Kompresi dan Resize menggunakan Intervention Image
+            $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+            $image = $manager->read($file->getRealPath());
+            
+            // Resize maksimum lebar 800px (proporsional) lalu kompres kualitas ke 85%
+            $image->scaleDown(width: 800);
+            $image->toJpeg(85)->save($path . '/' . $filename);
+
+            $data['image'] = 'products/' . $filename;
         }
 
         $product = Product::create($data);
@@ -110,7 +126,7 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5120', // Batas 5MB
             'status' => 'boolean',
             'is_best_seller' => 'boolean',
         ]);
@@ -118,11 +134,27 @@ class ProductController extends Controller
         $data = $request->except('image');
 
         if ($request->hasFile('image')) {
+            // Hapus gambar lama jika ada
             if ($product->image && \Illuminate\Support\Facades\Storage::disk('public')->exists($product->image)) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($product->image);
             }
-            $imagePath = $request->file('image')->store('products', 'public');
-            $data['image'] = $imagePath;
+
+            $file = $request->file('image');
+            $filename = uniqid() . '_' . time() . '.jpg';
+            $path = storage_path('app/public/products');
+            
+            if (!file_exists($path)) {
+                mkdir($path, 0755, true);
+            }
+
+            // Kompresi dan Resize menggunakan Intervention Image
+            $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+            $image = $manager->read($file->getRealPath());
+            
+            $image->scaleDown(width: 800);
+            $image->toJpeg(85)->save($path . '/' . $filename);
+
+            $data['image'] = 'products/' . $filename;
         }
 
         $product->update($data);
