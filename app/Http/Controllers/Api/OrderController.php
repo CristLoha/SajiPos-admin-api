@@ -232,36 +232,39 @@ class OrderController extends Controller
                         throw new \Exception("Gagal meng-generate QRIS via Xendit: " . $response->body());
                     }
                 } else {
-                    // Panggil API Xendit Invoices untuk VA / Transfer
+                    // Panggil API Xendit Virtual Accounts (Native VA)
+                    $bankCode = strtoupper($request->bank_code ?? 'BCA'); // Default BCA jika frontend belum ngirim
                     $response = \Illuminate\Support\Facades\Http::withBasicAuth($secretKey, '')
                         ->withHeaders([
                             'Content-Type' => 'application/json',
                         ])
-                        ->post('https://api.xendit.co/v2/invoices', [
+                        ->post('https://api.xendit.co/callback_virtual_accounts', [
                             'external_id' => $externalId,
-                            'amount' => (int) $order->total,
-                            'description' => 'Pembayaran pesanan ' . $invoiceNumber,
-                            'invoice_duration' => 1800, // 30 menit dalam detik
+                            'bank_code' => $bankCode,
+                            'name' => 'Pesanan ' . $invoiceNumber,
+                            'expected_amount' => (int) $order->total,
+                            'is_closed' => true,
+                            'is_single_use' => true,
+                            'expiration_date' => now()->addMinutes(30)->toIso8601ZuluString(),
                         ]);
 
                     if ($response->successful()) {
-                        $invoiceData = $response->json();
+                        $vaData = $response->json();
                         
                         // Simpan ke database
                         $order->midtrans_order_id = $externalId;
-                        $order->payment_token = $invoiceData['id'] ?? null; // Simpan invoice ID
+                        $order->payment_token = $vaData['id'] ?? null; // Simpan VA ID
                         $order->save();
 
                         $paymentDetails = [
                             'transaction_id' => $externalId,
-                            'payment_type' => 'transfer', // Ubah dari 'bank_transfer' ke 'transfer'
-                            'snap_token' => $invoiceData['id'] ?? null,
-                            'snap_redirect_url' => $invoiceData['invoice_url'] ?? null,
-                            'payment_url' => $invoiceData['invoice_url'] ?? null, // Tambahan untuk jaga-jaga
-                            'expires_at' => $invoiceData['expiry_date'] ?? null,
+                            'payment_type' => 'transfer',
+                            'bank_code' => $vaData['bank_code'] ?? $bankCode,
+                            'va_number' => $vaData['account_number'] ?? null,
+                            'expires_at' => $vaData['expiration_date'] ?? null,
                         ];
                     } else {
-                        throw new \Exception("Gagal membuat Invoice Xendit: " . $response->body());
+                        throw new \Exception("Gagal membuat Virtual Account Xendit: " . $response->body());
                     }
                 }
             }
@@ -405,19 +408,19 @@ class OrderController extends Controller
                     ], 200);
                 }
             } else {
-                // Untuk Transfer/VA, cek menggunakan Invoice ID yang disimpan di payment_token
-                $invoiceId = $order->payment_token;
-                if ($invoiceId) {
+                // Untuk Transfer/VA, cek menggunakan Virtual Account ID yang disimpan di payment_token
+                $vaId = $order->payment_token;
+                if ($vaId) {
                     $response = \Illuminate\Support\Facades\Http::withBasicAuth($secretKey, '')
-                        ->get("https://api.xendit.co/v2/invoices/{$invoiceId}");
+                        ->get("https://api.xendit.co/callback_virtual_accounts/{$vaId}");
                         
                     if ($response->successful()) {
                         $data = $response->json();
                         $transactionStatus = $data['status'] ?? 'PENDING';
                         
-                        if ($transactionStatus == 'PAID' || $transactionStatus == 'SETTLED') {
+                        if ($transactionStatus == 'COMPLETED' || $transactionStatus == 'PAID' || $transactionStatus == 'SETTLED') {
                             $order->status = 'success';
-                        } else if ($transactionStatus == 'EXPIRED') {
+                        } else if ($transactionStatus == 'INACTIVE' || $transactionStatus == 'EXPIRED') {
                             $order->status = 'failed';
                         } else {
                             $order->status = 'pending';
@@ -425,14 +428,13 @@ class OrderController extends Controller
                         
                         $order->save();
                         
-                        // Buat ulang payment_details karena di database tidak ada kolom payment_details
+                        // Buat ulang payment_details
                         $paymentDetails = [
                             'transaction_id' => $order->midtrans_order_id,
                             'payment_type' => 'transfer',
-                            'snap_token' => $invoiceId,
-                            'snap_redirect_url' => $data['invoice_url'] ?? null,
-                            'payment_url' => $data['invoice_url'] ?? null,
-                            'expires_at' => $data['expiry_date'] ?? null,
+                            'bank_code' => $data['bank_code'] ?? null,
+                            'va_number' => $data['account_number'] ?? null,
+                            'expires_at' => $data['expiration_date'] ?? null,
                         ];
 
                         return response()->json([
