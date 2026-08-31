@@ -255,9 +255,10 @@ class OrderController extends Controller
 
                         $paymentDetails = [
                             'transaction_id' => $externalId,
-                            'payment_type' => 'bank_transfer',
+                            'payment_type' => 'transfer', // Ubah dari 'bank_transfer' ke 'transfer'
                             'snap_token' => $invoiceData['id'] ?? null,
                             'snap_redirect_url' => $invoiceData['invoice_url'] ?? null,
+                            'payment_url' => $invoiceData['invoice_url'] ?? null, // Tambahan untuk jaga-jaga
                             'expires_at' => $invoiceData['expiry_date'] ?? null,
                         ];
                     } else {
@@ -384,6 +385,15 @@ class OrderController extends Controller
                     
                     $order->save();
                     
+                    $qrString = $data['qr_string'] ?? $order->payment_token;
+                    $paymentDetails = [
+                        'transaction_id' => $order->midtrans_order_id,
+                        'payment_type' => 'qris',
+                        'qr_string' => $qrString,
+                        'qr_image_url' => $qrString ? 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($qrString) : null,
+                        'expires_at' => $data['expires_at'] ?? null,
+                    ];
+
                     return response()->json([
                         'success' => true,
                         'message' => 'Status berhasil disinkronisasi',
@@ -391,7 +401,7 @@ class OrderController extends Controller
                             'order_id' => $order->id,
                             'status' => $order->status,
                             'xendit_status' => $transactionStatus,
-                            'payment_details' => $order->payment_details,
+                            'payment_details' => $paymentDetails,
                         ]
                     ], 200);
                 }
@@ -416,6 +426,16 @@ class OrderController extends Controller
                         
                         $order->save();
                         
+                        // Buat ulang payment_details karena di database tidak ada kolom payment_details
+                        $paymentDetails = [
+                            'transaction_id' => $order->midtrans_order_id,
+                            'payment_type' => 'transfer',
+                            'snap_token' => $invoiceId,
+                            'snap_redirect_url' => $data['invoice_url'] ?? null,
+                            'payment_url' => $data['invoice_url'] ?? null,
+                            'expires_at' => $data['expiry_date'] ?? null,
+                        ];
+
                         return response()->json([
                             'success' => true,
                             'message' => 'Status berhasil disinkronisasi',
@@ -423,7 +443,7 @@ class OrderController extends Controller
                                 'order_id' => $order->id,
                                 'status' => $order->status,
                                 'xendit_status' => $transactionStatus,
-                                'payment_details' => $order->payment_details,
+                                'payment_details' => $paymentDetails,
                             ]
                         ], 200);
                     }
