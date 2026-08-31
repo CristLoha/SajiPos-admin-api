@@ -241,7 +241,6 @@ class OrderController extends Controller
                             'external_id' => $externalId,
                             'amount' => (int) $order->total,
                             'description' => 'Pembayaran pesanan ' . $invoiceNumber,
-                            'payment_methods' => ['VIRTUAL_ACCOUNT', 'BANK_TRANSFER'],
                             'invoice_duration' => 1800, // 30 menit dalam detik
                         ]);
 
