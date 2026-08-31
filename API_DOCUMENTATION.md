@@ -10,6 +10,15 @@ Dokumentasi ini dibuat untuk mempermudah integrasi API antara Backend Laravel da
 https://sajipos.domcloud.dev/api
 ```
 
+> **Catatan Penanganan Error (Global):**
+> Jika terjadi error internal server (500), API secara otomatis tidak akan menampilkan *stack trace* HTML. Melainkan akan membalas dengan format JSON seragam:
+> ```json
+> {
+>     "success": false,
+>     "message": "Oops, server sedang bermasalah atau sedang dalam perbaikan. Coba lagi nanti ya!"
+> }
+> ```
+
 ---
 
 ## 🔐 0. API Autentikasi (Auth)
@@ -33,8 +42,15 @@ Melakukan login dengan menggunakan email atau username, mengembalikan token Sanc
     "password": "password123"
 }
 ```
+*Atau menggunakan username:*
+```json
+{
+    "username": "admin",
+    "password": "password123"
+}
+```
 
-> _Catatan: Anda juga bisa mengirimkan `"username"` pada field `"email"` (contoh: `"email": "admin"`)._
+> _Catatan: API backend akan mendeteksi otomatis apakah Anda menggunakan parameter `email` atau `username`._
 
 #### 📥 Response (200 OK)
 
@@ -457,8 +473,16 @@ Mengecek status pembayaran pesanan secara realtime langsung ke Xendit (berlaku u
     "message": "Status berhasil disinkronisasi",
     "data": {
         "order_id": 1,
-        "status": "success",
-        "xendit_status": "COMPLETED"
+        "status": "pending",
+        "xendit_status": "PENDING",
+        "payment_details": {
+            "transaction_id": "ORD-0001-123456",
+            "payment_type": "transfer",
+            "snap_token": "inv_1234567890",
+            "snap_redirect_url": "https://checkout.xendit.co/web/...",
+            "payment_url": "https://checkout.xendit.co/web/...",
+            "expires_at": "2026-08-31T10:00:00Z"
+        }
     }
 }
 ```
