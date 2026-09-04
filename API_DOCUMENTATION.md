@@ -453,9 +453,54 @@ Menyimpan transaksi order beserta item produk yang dibeli.
 > Mulai versi ini, Backend menggunakan **Xendit** sebagai payment gateway (menggantikan Midtrans).
 >
 > -   Jika `payment_method` adalah `"qris"`, field `payment_details.qr_string` akan berisi string standar QRIS. Frontend (Flutter) bertugas me-render string ini menjadi gambar QR Code secara mandiri (misal menggunakan library `qr_flutter`).
-> -   Jika `payment_method` adalah `"transfer"` atau `"bank_transfer"`, Backend akan memanggil Xendit Invoices. Object `payment_details` akan mereturn `snap_redirect_url` (contoh: `https://checkout-staging.xendit.co/web/...`) yang bisa langsung dibuka oleh Flutter via WebView atau URL Launcher.
+> -   Jika `payment_method` adalah `"transfer"` atau `"bank_transfer"`, Backend akan membuat **Virtual Account (VA) Xendit** native. Object `payment_details` akan mereturn `va_number` dan `bank_code` yang dapat langsung ditampilkan di UI Flutter agar user dapat melakukan transfer.
+> -   **Baru:** Untuk menampilkan daftar bank yang tersedia beserta logonya saat user memilih metode pembayaran Transfer, panggil API GET `/payment-channels`.
 
-### B. GET Cek Status Pembayaran (Sync)
+### B. GET Daftar Channel Pembayaran (Banks)
+
+Mengambil daftar bank yang tersedia untuk metode pembayaran transfer/virtual account beserta URL gambar logonya. Daftar ini sebaiknya ditampilkan di halaman checkout Flutter sebelum user klik "Buat Pesanan".
+
+-   **URL:** `/payment-channels`
+-   **Method:** `GET`
+-   **Headers:**
+    -   `Authorization: Bearer <your-token>`
+-   **Auth Required:** Yes (Sanctum)
+
+#### 📥 Response (200 OK)
+
+```json
+{
+    "status": "success",
+    "data": [
+        {
+            "bank_code": "BCA",
+            "name": "BCA",
+            "description": "Transfer via BCA Virtual Account",
+            "logo_url": "https://domainkamu.com/img/banks/bca.png"
+        },
+        {
+            "bank_code": "BNI",
+            "name": "BNI",
+            "description": "Transfer via BNI Virtual Account",
+            "logo_url": "https://domainkamu.com/img/banks/bni.png"
+        },
+        {
+            "bank_code": "MANDIRI",
+            "name": "MANDIRI",
+            "description": "Transfer via Mandiri Virtual Account",
+            "logo_url": "https://domainkamu.com/img/banks/mandiri.png"
+        },
+        {
+            "bank_code": "BRI",
+            "name": "BRI",
+            "description": "Transfer via BRI Virtual Account",
+            "logo_url": "https://domainkamu.com/img/banks/bri.png"
+        }
+    ]
+}
+```
+
+### C. GET Cek Status Pembayaran (Sync)
 
 Mengecek status pembayaran pesanan secara realtime langsung ke Xendit (berlaku untuk QRIS dan Invoices). Biasanya dipanggil oleh Flutter secara _polling_ atau saat menekan tombol "Cek Status".
 
