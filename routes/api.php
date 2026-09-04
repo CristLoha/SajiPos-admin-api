@@ -23,6 +23,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('campaigns/{id}', [\App\Http\Controllers\Api\CampaignController::class, 'show']);
 
     // API Routes untuk Orders (Bisa dilakukan kasir atau user)
+    Route::get('payment-channels', [\App\Http\Controllers\Api\OrderController::class, 'getPaymentChannels']);
     Route::post('orders/hitung-total', [\App\Http\Controllers\Api\OrderController::class, 'calculateTotal']);
     Route::post('orders', [\App\Http\Controllers\Api\OrderController::class, 'store']);
     Route::get('orders', [\App\Http\Controllers\Api\OrderController::class, 'index']);

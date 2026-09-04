@@ -518,4 +518,39 @@ class OrderController extends Controller
             'message' => 'Data Pesanan berhasil dihapus'
         ], 200);
     }
+
+    public function getPaymentChannels()
+    {
+        $banks = [
+            [
+                'bank_code' => 'BCA',
+                'name' => 'BCA',
+                'description' => 'Transfer via BCA Virtual Account',
+                'logo_url' => asset('img/banks/bca.png'),
+            ],
+            [
+                'bank_code' => 'BNI',
+                'name' => 'BNI',
+                'description' => 'Transfer via BNI Virtual Account',
+                'logo_url' => asset('img/banks/bni.png'),
+            ],
+            [
+                'bank_code' => 'MANDIRI',
+                'name' => 'MANDIRI',
+                'description' => 'Transfer via Mandiri Virtual Account',
+                'logo_url' => asset('img/banks/mandiri.png'),
+            ],
+            [
+                'bank_code' => 'BRI',
+                'name' => 'BRI',
+                'description' => 'Transfer via BRI Virtual Account',
+                'logo_url' => asset('img/banks/bri.png'),
+            ],
+        ];
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $banks
+        ]);
+    }
 }
