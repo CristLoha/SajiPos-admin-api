@@ -521,26 +521,37 @@ class OrderController extends Controller
 
     public function getPaymentChannels()
     {
-        $banks = [
+        $channels = [
             [
+                'payment_method' => 'qris',
+                'bank_code' => 'QRIS',
+                'name' => 'QRIS',
+                'description' => 'Bayar menggunakan scan QRIS',
+                'logo_url' => asset('img/banks/qris.png'), // Atau sesuaikan path-nya
+            ],
+            [
+                'payment_method' => 'transfer',
                 'bank_code' => 'BCA',
                 'name' => 'BCA',
                 'description' => 'Transfer via BCA Virtual Account',
                 'logo_url' => asset('img/banks/bca.png'),
             ],
             [
+                'payment_method' => 'transfer',
                 'bank_code' => 'BNI',
                 'name' => 'BNI',
                 'description' => 'Transfer via BNI Virtual Account',
                 'logo_url' => asset('img/banks/bni.png'),
             ],
             [
+                'payment_method' => 'transfer',
                 'bank_code' => 'MANDIRI',
                 'name' => 'MANDIRI',
                 'description' => 'Transfer via Mandiri Virtual Account',
                 'logo_url' => asset('img/banks/mandiri.png'),
             ],
             [
+                'payment_method' => 'transfer',
                 'bank_code' => 'BRI',
                 'name' => 'BRI',
                 'description' => 'Transfer via BRI Virtual Account',
@@ -550,7 +561,7 @@ class OrderController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $banks
+            'data' => $channels
         ]);
     }
 }
