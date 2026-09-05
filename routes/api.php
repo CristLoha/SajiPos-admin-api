@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+Route::post('/register', [\App\Http\Controllers\Api\AuthController::class, 'register']);
 Route::post('/login', [\App\Http\Controllers\Api\AuthController::class, 'login'])->middleware('throttle:5,1');
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -46,8 +47,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('menu-terlaris/harian', [\App\Http\Controllers\Api\MenuAnalyticsController::class, 'getTopMenusDaily']);
 
 
-    // AREA KHUSUS ADMIN & STAFF (Ubah Master Data & Laporan)
-    Route::middleware('role:admin,staff')->group(function () {
+    // AREA KHUSUS ADMIN (Ubah Master Data)
+    Route::middleware('role:admin')->group(function () {
         
         // Modifikasi Master Data
         Route::apiResource('categories', \App\Http\Controllers\Api\CategoryController::class)->except(['index', 'show'])->names([
@@ -68,6 +69,14 @@ Route::middleware('auth:sanctum')->group(function () {
             'destroy' => 'api.discounts.destroy',
         ]);
 
+        // Modifikasi Akses & Persetujuan Kasir
+        Route::get('users/cashiers', [\App\Http\Controllers\Api\UserController::class, 'getCashiers']);
+        Route::post('users/{id}/confirm', [\App\Http\Controllers\Api\UserController::class, 'confirmCashier']);
+
+    });
+
+    // AREA KHUSUS ADMIN & STAFF (Laporan & Pengaturan)
+    Route::middleware('role:admin,staff')->group(function () {
         // API Routes untuk Laporan Kasir
         Route::get('cashier/reports/transactions', [\App\Http\Controllers\Api\ReportController::class, 'transactions']);
 

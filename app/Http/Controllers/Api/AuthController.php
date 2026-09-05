@@ -11,6 +11,41 @@ use Illuminate\Validation\ValidationException;
 class AuthController extends Controller
 {
     /**
+     * Handle user registration (kasir).
+     * POST /api/register
+     */
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'username' => 'nullable|string|max:255|unique:users',
+            'password' => 'required|string|min:6',
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'username' => $request->username,
+            'password' => Hash::make($request->password),
+            'roles' => 'staff', // automatically assigned as staff/kasir
+            'status' => 'pending', // awaits admin approval
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pendaftaran berhasil. Akun Anda sedang menunggu persetujuan Admin.',
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'status' => $user->status,
+                'role' => $user->roles,
+            ]
+        ], 201);
+    }
+
+    /**
      * Handle user login and issue API token.
      * POST /api/login
      */
@@ -35,6 +70,20 @@ class AuthController extends Controller
                 'success' => false,
                 'message' => 'Email/Username atau password salah.'
             ], 401);
+        }
+
+        if ($user->status === 'pending') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akun Anda sedang menunggu persetujuan Admin.'
+            ], 403);
+        }
+
+        if ($user->status === 'rejected') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pendaftaran akun Anda ditolak oleh Admin.'
+            ], 403);
         }
 
         // Generate Sanctum token
