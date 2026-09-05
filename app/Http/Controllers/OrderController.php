@@ -58,7 +58,7 @@ class OrderController extends Controller
     public function destroyAll()
     {
         // Pastikan hanya admin yang bisa (tambahan security meski sudah di middleware)
-        if (!in_array(auth()->user()->roles, ['admin', 'staff', 'user'])) {
+        if (auth()->user()->roles !== 'admin') {
             return redirect()->route('orders.index')->with('error', 'Anda tidak memiliki akses untuk menghapus semua pesanan.');
         }
 
@@ -86,7 +86,7 @@ class OrderController extends Controller
     public function bulkDelete(Request $request)
     {
         // Pastikan hanya admin yang bisa
-        if (!in_array(auth()->user()->roles, ['admin', 'staff', 'user'])) {
+        if (auth()->user()->roles !== 'admin') {
             return redirect()->route('orders.index')->with('error', 'Anda tidak memiliki akses untuk aksi ini.');
         }
 

@@ -11,7 +11,7 @@ class CategoryController extends Controller
     // Cek apakah user adalah admin (untuk aksi CRUD)
     private function isAdmin()
     {
-        if (!in_array(auth()->user()->roles, ['admin', 'staff', 'user'])) {
+        if (auth()->user()->roles !== 'admin') {
             abort(403, 'Hanya admin yang bisa melakukan aksi ini.');
         }
     }

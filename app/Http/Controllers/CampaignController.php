@@ -11,7 +11,7 @@ class CampaignController extends Controller
 {
     private function isAdmin()
     {
-        if (!in_array(auth()->user()->roles, ['admin', 'staff', 'user'])) {
+        if (auth()->user()->roles !== 'admin') {
             abort(403, 'Hanya admin yang bisa melakukan aksi ini.');
         }
     }

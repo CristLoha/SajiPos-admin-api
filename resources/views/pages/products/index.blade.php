@@ -12,9 +12,11 @@
                         <a href="{{ route('discounts.index') }}" class="btn btn-outline-primary mr-2">
                             <i class="fas fa-percent mr-1"></i>Kelola Diskon
                         </a>
+                        @if(auth()->user()->roles == 'admin')
                         <a href="{{ route('products.create') }}" class="btn btn-primary">
                             <i class="fas fa-plus mr-1"></i>Tambah Produk
                         </a>
+                        @endif
                     </div>
                 @endif
                 <div class="section-header-breadcrumb">
@@ -150,22 +152,22 @@
                                                         @endif
                                                     </td>
                                                     <td class="text-center">
-                                                        @if (in_array(auth()->user()->roles, ['admin', 'staff', 'user']))
+                                                        @if(auth()->user()->roles == 'admin')
                                                             <div class="d-flex justify-content-center">
                                                                 <a href="{{ route('products.edit', $product->id) }}"
-                                                                    class="btn btn-sm btn-info btn-icon mr-1"
-                                                                    data-toggle="tooltip" title="Edit Produk">
+                                                                    class="btn btn-sm btn-info btn-icon mr-2">
                                                                     <i class="fas fa-edit"></i>
+                                                                    Edit
                                                                 </a>
-
                                                                 <form action="{{ route('products.destroy', $product->id) }}"
-                                                                    method="POST" class="ml-1"
+                                                                    method="POST"
+                                                                    class="delete-form"
                                                                     onsubmit="return confirm('Apakah Anda yakin ingin menghapus produk ini?');">
                                                                     @csrf
                                                                     @method('DELETE')
                                                                     <button class="btn btn-sm btn-danger btn-icon"
-                                                                        data-toggle="tooltip" title="Hapus Produk">
-                                                                        <i class="fas fa-trash-alt"></i>
+                                                                        type="submit">
+                                                                        <i class="fas fa-trash"></i> Hapus
                                                                     </button>
                                                                 </form>
                                                             </div>
