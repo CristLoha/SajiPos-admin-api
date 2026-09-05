@@ -23,6 +23,8 @@ class Order extends Model
         'payment_method',
         'midtrans_order_id',
         'payment_token',
+        'bank_code',
+        'va_number',
         'receipt_token',
         'status',
     ];
@@ -42,17 +44,12 @@ class Order extends Model
                 'expires_at' => $this->created_at ? $this->created_at->copy()->addMinutes(30)->toIso8601ZuluString() : null,
             ];
         } elseif (in_array($paymentMethod, ['transfer', 'bank_transfer'])) {
-            // Kita construct invoice_url berdasarkan ID invoice yang tersimpan di payment_token
-            $invoiceId = $this->payment_token;
-            // Gunakan checkout.xendit.co untuk live/production. 
-            // Jika mode sandbox, Xendit otomatis me-redirect checkout.xendit.co ke checkout-staging.xendit.co
-            $invoiceUrl = $invoiceId ? 'https://checkout.xendit.co/web/' . $invoiceId : null;
-
             return [
                 'transaction_id' => $this->midtrans_order_id,
                 'payment_type' => 'bank_transfer',
-                'snap_token' => $invoiceId,
-                'snap_redirect_url' => $invoiceUrl,
+                'bank_code' => $this->bank_code,
+                'va_number' => $this->va_number,
+                'va_id' => $this->payment_token, // Xendit VA ID
                 'expires_at' => $this->created_at ? $this->created_at->copy()->addMinutes(30)->toIso8601ZuluString() : null,
             ];
         }

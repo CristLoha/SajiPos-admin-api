@@ -254,6 +254,8 @@ class OrderController extends Controller
                         // Simpan ke database
                         $order->midtrans_order_id = $externalId;
                         $order->payment_token = $vaData['id'] ?? null; // Simpan VA ID
+                        $order->bank_code = $vaData['bank_code'] ?? $bankCode;
+                        $order->va_number = $vaData['account_number'] ?? null;
                         $order->save();
 
                         $paymentDetails = [
@@ -426,6 +428,8 @@ class OrderController extends Controller
                             $order->status = 'pending';
                         }
                         
+                        $order->bank_code = $data['bank_code'] ?? $order->bank_code;
+                        $order->va_number = $data['account_number'] ?? $order->va_number;
                         $order->save();
                         
                         // Buat ulang payment_details
