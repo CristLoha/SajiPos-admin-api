@@ -26,19 +26,27 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [\App\Http\Controllers\UserController::class, 'editProfile'])->name('profile.edit')->middleware('role:admin,staff,user');
     Route::put('/profile', [\App\Http\Controllers\UserController::class, 'updateProfile'])->name('profile.update')->middleware('role:admin,staff,user');
 
-    // AREA KHUSUS ADMIN (Master Data)
+    // MASTER DATA (Read-Only untuk semua role termasuk Kasir)
+    Route::middleware('role:admin,staff,user')->group(function () {
+        Route::resource('categories', CategoryController::class)->only(['index', 'show']);
+        Route::resource('products', ProductController::class)->only(['index', 'show']);
+        Route::resource('discounts', \App\Http\Controllers\DiscountController::class)->only(['index', 'show']);
+        Route::resource('campaigns', \App\Http\Controllers\CampaignController::class)->only(['index', 'show']);
+    });
+
+    // AREA KHUSUS ADMIN (Create, Edit, Delete Master Data)
     Route::middleware('role:admin')->group(function () {
         // Categories
-        Route::resource('categories', CategoryController::class);
+        Route::resource('categories', CategoryController::class)->except(['index', 'show']);
 
         // Products
-        Route::resource('products', ProductController::class);
+        Route::resource('products', ProductController::class)->except(['index', 'show']);
 
         // Discounts
-        Route::resource('discounts', \App\Http\Controllers\DiscountController::class);
+        Route::resource('discounts', \App\Http\Controllers\DiscountController::class)->except(['index', 'show']);
 
         // Campaigns
-        Route::resource('campaigns', \App\Http\Controllers\CampaignController::class);
+        Route::resource('campaigns', \App\Http\Controllers\CampaignController::class)->except(['index', 'show']);
         
         // Delete Orders
         Route::delete('orders/destroy-all', [\App\Http\Controllers\OrderController::class, 'destroyAll'])->name('orders.destroyAll');
