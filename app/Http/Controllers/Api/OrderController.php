@@ -527,6 +527,13 @@ class OrderController extends Controller
     {
         $channels = [
             [
+                'payment_method' => 'cash',
+                'bank_code' => 'CASH',
+                'name' => 'Tunai',
+                'description' => 'Pembayaran dengan uang tunai',
+                'logo_url' => asset('img/banks/cash.png'), // Pastikan icon ada
+            ],
+            [
                 'payment_method' => 'qris',
                 'bank_code' => 'QRIS',
                 'name' => 'QRIS',
