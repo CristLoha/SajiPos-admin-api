@@ -317,12 +317,22 @@ class OrderController extends Controller
             $query->where('cashier_id', $request->cashier_id);
         }
 
-        $orders = $query->get();
+        // Support pagination for infinite scroll in Flutter
+        // Use ?limit=10 & ?page=1 in the request
+        $limit = $request->get('limit', 10);
+        $orders = $query->paginate($limit);
 
         return response()->json([
             'success' => true,
             'message' => 'List Riwayat Transaksi',
-            'data' => $orders
+            'data' => $orders->items(),
+            'meta' => [
+                'current_page' => $orders->currentPage(),
+                'last_page' => $orders->lastPage(),
+                'per_page' => $orders->perPage(),
+                'total' => $orders->total(),
+                'has_more' => $orders->hasMorePages()
+            ]
         ], 200);
     }
 
