@@ -46,7 +46,7 @@ class Order extends Model
         } elseif (in_array($paymentMethod, ['transfer', 'bank_transfer'])) {
             return [
                 'transaction_id' => $this->midtrans_order_id,
-                'payment_type' => 'bank_transfer',
+                'payment_type' => 'transfer',
                 'bank_code' => $this->bank_code,
                 'va_number' => $this->va_number,
                 'va_id' => $this->payment_token, // Xendit VA ID
