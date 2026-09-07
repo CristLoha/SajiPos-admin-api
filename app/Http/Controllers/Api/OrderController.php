@@ -343,24 +343,22 @@ class OrderController extends Controller
         if (!in_array(strtolower($order->payment_method), ['qris', 'transfer', 'bank_transfer'])) {
             return response()->json([
                 'success' => false,
-                'message' => 'Pesanan ini tidak menggunakan metode pembayaran Midtrans'
+                'message' => 'Pesanan ini tidak menggunakan metode pembayaran Xendit'
             ], 400);
         }
 
         if (!$order->midtrans_order_id) {
-            // Jika untuk data lama yang belum punya midtrans_order_id (sebelum fitur ini dibuat)
-            // Kita tidak bisa mengecek ke Midtrans karena order_id Midtrans-nya mengandung timestamp yang tidak kita simpan.
-            // Solusi: Kita otomatis anggap failed/expired (karena ini pasti data testing lama).
+            // Jika untuk data lama yang belum punya ID transaksi Xendit (midtrans_order_id)
             $order->status = 'failed';
             $order->save();
             
             return response()->json([
                 'success' => true,
-                'message' => 'Data lama (tanpa ID Midtrans) otomatis dibatalkan karena tidak dapat dilacak.',
+                'message' => 'Data lama otomatis dibatalkan karena tidak memiliki ID transaksi Xendit.',
                 'data' => [
                     'order_id' => $order->id,
                     'status' => $order->status,
-                    'midtrans_status' => 'expire'
+                    'xendit_status' => 'expire'
                 ]
             ], 200);
         }
