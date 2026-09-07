@@ -37,20 +37,20 @@ class Order extends Model
         
         if ($paymentMethod === 'qris') {
             return [
-                'transaction_id' => $this->midtrans_order_id,
+                'transaction_id' => $this->midtrans_order_id ?? '',
                 'payment_type' => 'qris',
-                'qr_string' => $this->payment_token,
-                'qr_image_url' => $this->payment_token ? 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($this->payment_token) : null,
-                'expires_at' => $this->created_at ? $this->created_at->copy()->addMinutes(30)->toIso8601ZuluString() : null,
+                'qr_string' => $this->payment_token ?? '',
+                'qr_image_url' => $this->payment_token ? 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($this->payment_token) : '',
+                'expires_at' => $this->created_at ? $this->created_at->copy()->addMinutes(30)->toIso8601ZuluString() : '',
             ];
         } elseif (in_array($paymentMethod, ['transfer', 'bank_transfer'])) {
             return [
-                'transaction_id' => $this->midtrans_order_id,
+                'transaction_id' => $this->midtrans_order_id ?? '',
                 'payment_type' => 'transfer',
-                'bank_code' => $this->bank_code,
-                'va_number' => $this->va_number,
-                'va_id' => $this->payment_token, // Xendit VA ID
-                'expires_at' => $this->created_at ? $this->created_at->copy()->addMinutes(30)->toIso8601ZuluString() : null,
+                'bank_code' => $this->bank_code ?? '',
+                'va_number' => $this->va_number ?? '',
+                'va_id' => $this->payment_token ?? '', // Xendit VA ID
+                'expires_at' => $this->created_at ? $this->created_at->copy()->addMinutes(30)->toIso8601ZuluString() : '',
             ];
         }
 
