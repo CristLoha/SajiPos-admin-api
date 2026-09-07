@@ -225,8 +225,8 @@ class OrderController extends Controller
                             'transaction_id' => $externalId ?? '',
                             'payment_type' => 'qris',
                             'qr_string' => $qrString ?? '',
-                            'qr_image_url' => $qrString ? 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($qrString) : '',
-                            'expires_at' => $qrData['expires_at'] ?? '',
+                            'qr_image_url' => $qrString ? 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($qrString) : null,
+                            'expires_at' => $qrData['expires_at'] ?? null,
                         ];
                     } else {
                         throw new \Exception("Gagal meng-generate QRIS via Xendit: " . $response->body());
@@ -264,7 +264,7 @@ class OrderController extends Controller
                             'bank_code' => $vaData['bank_code'] ?? $bankCode ?? '',
                             'va_number' => $vaData['account_number'] ?? '',
                             'va_id' => $vaData['id'] ?? '',
-                            'expires_at' => $vaData['expiration_date'] ?? '',
+                            'expires_at' => $vaData['expiration_date'] ?? null,
                         ];
                     } else {
                         throw new \Exception("Gagal membuat Virtual Account Xendit: " . $response->body());
@@ -393,8 +393,8 @@ class OrderController extends Controller
                         'transaction_id' => $order->midtrans_order_id ?? '',
                         'payment_type' => 'qris',
                         'qr_string' => $qrString ?? '',
-                        'qr_image_url' => $qrString ? 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($qrString) : '',
-                        'expires_at' => $data['expires_at'] ?? '',
+                        'qr_image_url' => $qrString ? 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($qrString) : null,
+                        'expires_at' => $data['expires_at'] ?? null,
                     ];
 
                     return response()->json([
@@ -438,7 +438,7 @@ class OrderController extends Controller
                             'bank_code' => $data['bank_code'] ?? $order->bank_code ?? '',
                             'va_number' => $data['account_number'] ?? $order->va_number ?? '',
                             'va_id' => $order->payment_token ?? '',
-                            'expires_at' => $data['expiration_date'] ?? '',
+                            'expires_at' => $data['expiration_date'] ?? null,
                         ];
 
                         return response()->json([
