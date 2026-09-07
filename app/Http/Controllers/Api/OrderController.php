@@ -317,6 +317,18 @@ class OrderController extends Controller
             $query->where('cashier_id', $request->cashier_id);
         }
 
+        // Filter by date range (start_date & end_date)
+        if ($request->has('start_date') && $request->has('end_date')) {
+            $query->whereBetween('transaction_time', [
+                $request->start_date . ' 00:00:00',
+                $request->end_date . ' 23:59:59'
+            ]);
+        } elseif ($request->has('start_date')) {
+            $query->where('transaction_time', '>=', $request->start_date . ' 00:00:00');
+        } elseif ($request->has('end_date')) {
+            $query->where('transaction_time', '<=', $request->end_date . ' 23:59:59');
+        }
+
         // Support pagination for infinite scroll in Flutter
         // Use ?limit=10 & ?page=1 in the request
         $limit = $request->get('limit', 10);
