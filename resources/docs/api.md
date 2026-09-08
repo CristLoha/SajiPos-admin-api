@@ -47,9 +47,41 @@ Digunakan pada form registrasi untuk men-generate saran username yang belum terp
 }
 ```
 
-### B. POST Pendaftaran Akun (Register)
+### B. POST Cek Ketersediaan Email (Real-Time)
 
-Mendaftarkan akun baru (secara default akan menjadi `user` / Kasir dengan status `pending_approval`). API ini otomatis mengirimkan email berisi 6 digit OTP.
+Digunakan oleh Flutter saat user mengetik email untuk memberikan tanda centang hijau (valid) atau silang merah (tidak valid/sudah dipakai). 
+
+-   **URL:** `/check-email`
+-   **Method:** `POST`
+-   **Auth Required:** No
+
+#### 📤 Request Body (JSON)
+```json
+{
+    "email": "budi@gmail.com"
+}
+```
+
+#### 📥 Response (200 OK)
+Jika email belum pernah didaftarkan ATAU email pernah didaftarkan tapi statusnya belum terverifikasi OTP (nyangkut):
+```json
+{
+    "is_valid": true,
+    "message": "Email bisa digunakan."
+}
+```
+Jika email sudah terdaftar dan terverifikasi, ATAU format email salah:
+```json
+{
+    "is_valid": false,
+    "message": "Email sudah terdaftar dan terverifikasi."
+}
+```
+
+### C. POST Pendaftaran Akun (Register)
+
+Mendaftarkan akun baru. API otomatis mengirimkan email berisi 6 digit OTP. 
+**Penting:** Jika user mendaftar menggunakan email yang *belum terverifikasi*, sistem akan menimpa data lama dengan data baru (Jalan Ninja) dan me-return 201 Created. Jika email sudah diverifikasi, akan me-return 422 Unprocessable Entity.
 
 -   **URL:** `/register`
 -   **Method:** `POST`
@@ -79,7 +111,19 @@ Mendaftarkan akun baru (secara default akan menjadi `user` / Kasir dengan status
 }
 ```
 
-### C. POST Verifikasi Email OTP
+#### 📥 Error Response (422 Unprocessable Entity - Email Gagal Terkirim / Bounce)
+```json
+{
+    "message": "Email tidak valid, tidak terdaftar, atau server gagal mengirim pesan.",
+    "errors": {
+        "email": [
+            "Alamat email ini tidak dapat menerima pesan. Pastikan email benar-benar aktif."
+        ]
+    }
+}
+```
+
+### D. POST Verifikasi Email OTP
 
 Memvalidasi kode 6 digit OTP yang dikirimkan ke email pendaftar.
 
@@ -103,7 +147,7 @@ Memvalidasi kode 6 digit OTP yang dikirimkan ke email pendaftar.
 }
 ```
 
-### D. POST Kirim Ulang OTP (Resend)
+### E. POST Kirim Ulang OTP (Resend)
 
 Meminta sistem membuat kode OTP baru dan mengirimkan ulang ke email jika tidak masuk.
 
@@ -118,7 +162,7 @@ Meminta sistem membuat kode OTP baru dan mengirimkan ulang ke email jika tidak m
 }
 ```
 
-### E. POST Login Kasir
+### F. POST Login Kasir
 
 Melakukan login dengan menggunakan email atau username, mengembalikan token Sanctum untuk otentikasi API selanjutnya. Harus sudah di-Approve oleh Admin.
 
@@ -613,10 +657,15 @@ Mengecek status pembayaran pesanan secara realtime langsung ke Xendit (berlaku u
 
 ### C. GET List Riwayat Transaksi
 
-Mengambil semua riwayat transaksi kasir yang ada di sistem.
+Mengambil riwayat transaksi. 
+**Penting (Role-Based Access):**
+- Jika user yang login memiliki role `user` (Kasir), API ini otomatis memfilter dan hanya mengembalikan riwayat transaksinya sendiri.
+- Jika user yang login memiliki role `admin` atau `staff`, API ini akan mengembalikan seluruh riwayat transaksi dari semua kasir.
 
 -   **URL:** `/orders`
 -   **Method:** `GET`
+-   **Query Parameters (Opsional):**
+    -   `cashier_id` (int) - Hanya berlaku untuk Admin/Staff untuk memfilter berdasarkan kasir.
 -   **Headers:**
     -   `Content-Type: application/json`
     -   `Authorization: Bearer <your-token>`
