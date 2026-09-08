@@ -336,6 +336,7 @@
             });
 
             const notifSound = document.getElementById('notif-sound');
+            let baseTitle = document.title.replace(/^\(\d+\)\s+/, ''); // Simpan judul asli tab
 
             // Polling function
             function pollUserStatus() {
@@ -344,6 +345,14 @@
                     .then(data => {
                         let incomingIds = data.users.map(u => u.id);
                         
+                        // Update Badge Notifikasi di Tab Browser (Ala Facebook)
+                        let pendingCount = data.users.length;
+                        if (pendingCount > 0) {
+                            document.title = `(${pendingCount}) ${baseTitle}`;
+                        } else {
+                            document.title = baseTitle;
+                        }
+
                         // Check for brand new users that are not in our known DOM
                         let hasNewUser = incomingIds.some(id => !knownUserIds.includes(id));
 
