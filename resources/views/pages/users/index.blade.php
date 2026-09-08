@@ -228,10 +228,10 @@
                                     <div class="form-group">
                                         <label>Role</label>
                                         <select name="role" class="form-control selectric" required>
-                                            <option value="" disabled selected>Pilih Role...</option>
-                                            <option value="admin">Admin</option>
-                                            <option value="staff">Staff</option>
-                                            <option value="user">User (Kasir)</option>
+                                            <option value="" disabled>Pilih Role...</option>
+                                            <option value="admin" {{ $user->roles == 'admin' ? 'selected' : '' }}>Admin</option>
+                                            <option value="staff" {{ $user->roles == 'staff' ? 'selected' : '' }}>Staff</option>
+                                            <option value="user" {{ $user->roles == 'user' ? 'selected' : '' }}>User (Kasir)</option>
                                         </select>
                                     </div>
                                 </div>

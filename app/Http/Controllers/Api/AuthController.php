@@ -30,7 +30,7 @@ class AuthController extends Controller
             'email' => $validated['email'],
             'username' => $validated['username'],
             'password' => Hash::make($validated['password']),
-            'roles' => null, // role ditentukan admin saat approve
+            'roles' => 'user', // default role adalah kasir
             'status_akun' => 'pending_approval',
             'otp_code' => $otpCode,
             'otp_expires_at' => now()->addMinutes(10),
