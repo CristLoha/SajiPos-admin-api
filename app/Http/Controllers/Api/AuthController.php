@@ -19,7 +19,7 @@ class AuthController extends Controller
         $validated = $request->validate([
             'nama_lengkap' => 'required|string|max:255',
             'username' => 'required|string|max:50|unique:users,username',
-            'email' => 'required|email|unique:users,email',
+            'email' => 'required|email:rfc,dns|unique:users,email',
             'password' => [
                 'required',
                 'string',
@@ -32,6 +32,7 @@ class AuthController extends Controller
         ], [
             'password.regex' => 'Password harus mengandung huruf besar, huruf kecil, dan angka.',
             'password.min' => 'Password minimal 8 karakter.',
+            'email.email' => 'Format email tidak valid atau domain tidak ditemukan.',
         ]);
 
         $otpCode = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
@@ -50,8 +51,14 @@ class AuthController extends Controller
         try {
             \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\OtpMail($user, $otpCode));
         } catch (\Exception $e) {
-            // Jika gagal kirim email, biarkan pendaftaran sukses, user bisa minta resend OTP nanti
-            \Illuminate\Support\Facades\Log::error('Gagal kirim email OTP: ' . $e->getMessage());
+            // Jika gagal kirim email (misal: email tidak eksis/bounce), HAPUS user yang terlanjur dibuat
+            $user->delete();
+            \Illuminate\Support\Facades\Log::error('Gagal kirim email OTP (User Rollback): ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Email tidak terdaftar atau tidak dapat menerima pesan. Silakan gunakan email aktif yang valid.'
+            ], 422);
         }
 
         return response()->json([
@@ -132,7 +139,11 @@ class AuthController extends Controller
         try {
             \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\OtpMail($user, $otpCode));
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Gagal mengirim ulang email OTP.'], 500);
+            \Illuminate\Support\Facades\Log::error('Gagal resend email OTP: ' . $e->getMessage());
+            return response()->json([
+                'success' => false, 
+                'message' => 'Email gagal dikirim. Pastikan alamat email benar-benar aktif atau coba gunakan email lain.'
+            ], 422);
         }
 
         return response()->json(['success' => true, 'message' => 'Kode OTP baru telah dikirim ke email.'], 200);
