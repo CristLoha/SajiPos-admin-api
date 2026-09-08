@@ -21,67 +21,146 @@ https://sajipos.domcloud.dev/api
 
 ---
 
-## 🔐 0. API Autentikasi (Auth)
+## 🔐 0. API Autentikasi (Auth) & Akun
 
-Mengamankan sesi kasir dan memvalidasi akses aplikasi Flutter.
+Mengamankan sesi aplikasi, pendaftaran kasir baru, dan proses verifikasi email (OTP).
 
-### A. POST Login Kasir
+### A. GET Saran Username & Password (Real-Time)
 
-Melakukan login dengan menggunakan email atau username, mengembalikan token Sanctum untuk otentikasi API selanjutnya.
+Digunakan pada form registrasi untuk men-generate saran username yang belum terpakai dan password yang kuat (passphrase).
 
--   **URL:** `/login`
+-   **URL:** `/suggestions/credentials`
+-   **Method:** `GET`
+-   **Auth Required:** No
+-   **Query Parameters:**
+    -   `nama_lengkap` (string, opsional) - Nama untuk dijadikan base username/password.
+
+#### 📥 Response (200 OK)
+```json
+{
+    "success": true,
+    "message": "Saran username dan password berhasil dibuat.",
+    "data": {
+        "username": "budi842",
+        "password": "BudiPos193"
+    }
+}
+```
+
+### B. POST Pendaftaran Akun (Register)
+
+Mendaftarkan akun baru (secara default akan menjadi `user` / Kasir dengan status `pending_approval`). API ini otomatis mengirimkan email berisi 6 digit OTP.
+
+-   **URL:** `/register`
 -   **Method:** `POST`
 -   **Headers:** `Content-Type: application/json`
 -   **Auth Required:** No
 
 #### 📤 Request Body (JSON)
-
 ```json
 {
-    "email": "admin@sajipos.com",
-    "password": "password123"
-}
-```
-*Atau menggunakan username:*
-```json
-{
-    "username": "admin",
-    "password": "password123"
+    "nama_lengkap": "Budi Santoso",
+    "username": "budi842",
+    "email": "budi@gmail.com",
+    "password": "BudiPos193",
+    "password_confirmation": "BudiPos193"
 }
 ```
 
-> _Catatan: API backend akan mendeteksi otomatis apakah Anda menggunakan parameter `email` atau `username`._
+#### 📥 Response (201 Created)
+```json
+{
+    "success": true,
+    "message": "Registrasi berhasil! Silakan cek email Anda untuk kode OTP 6 digit.",
+    "data": {
+        "user_id": 15,
+        "email": "budi@gmail.com"
+    }
+}
+```
+
+### C. POST Verifikasi Email OTP
+
+Memvalidasi kode 6 digit OTP yang dikirimkan ke email pendaftar.
+
+-   **URL:** `/verify-email`
+-   **Method:** `POST`
+-   **Auth Required:** No
+
+#### 📤 Request Body (JSON)
+```json
+{
+    "email": "budi@gmail.com",
+    "otp_code": "123456"
+}
+```
 
 #### 📥 Response (200 OK)
+```json
+{
+    "success": true,
+    "message": "Email berhasil diverifikasi! Akun Anda sekarang menunggu persetujuan Admin."
+}
+```
 
+### D. POST Kirim Ulang OTP (Resend)
+
+Meminta sistem membuat kode OTP baru dan mengirimkan ulang ke email jika tidak masuk.
+
+-   **URL:** `/resend-otp`
+-   **Method:** `POST`
+-   **Auth Required:** No
+
+#### 📤 Request Body (JSON)
+```json
+{
+    "email": "budi@gmail.com"
+}
+```
+
+### E. POST Login Kasir
+
+Melakukan login dengan menggunakan email atau username, mengembalikan token Sanctum untuk otentikasi API selanjutnya. Harus sudah di-Approve oleh Admin.
+
+-   **URL:** `/login`
+-   **Method:** `POST`
+-   **Auth Required:** No
+
+#### 📤 Request Body (JSON)
+```json
+{
+    "username": "budi842",
+    "password": "BudiPos193"
+}
+```
+
+#### 📥 Response (200 OK)
 ```json
 {
     "success": true,
     "message": "Login berhasil!",
     "token": "1|laravel_sanctum_token_string_here...",
     "user": {
-        "id": 1,
-        "name": "Admin SajiPOS",
-        "email": "admin@sajipos.com",
-        "username": "admin",
-        "role": "admin"
+        "id": 15,
+        "name": "Budi Santoso",
+        "email": "budi@gmail.com",
+        "username": "budi842",
+        "role": "user"
     }
 }
 ```
+*(Akan mengembalikan `403 Forbidden` jika status akun masih `pending_approval` atau belum verifikasi email).*
 
-### B. POST Logout Kasir
+### F. POST Logout Kasir
 
 Menghapus token akses API saat ini (mengakhiri sesi).
 
 -   **URL:** `/logout`
 -   **Method:** `POST`
--   **Headers:**
-    -   `Content-Type: application/json`
-    -   `Authorization: Bearer <your-token>`
+-   **Headers:** `Authorization: Bearer <your-token>`
 -   **Auth Required:** Yes (Sanctum)
 
 #### 📥 Response (200 OK)
-
 ```json
 {
     "success": true,
