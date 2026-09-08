@@ -25,6 +25,7 @@
                     <div class="breadcrumb-item">{{ request('status') == 'pending_approval' ? 'Approval' : 'Semua Users' }}</div>
                 </div>
             </div>
+            <div id="live-users-container">
             <div class="section-body">
                 <div class="row">
                     <div class="col-12">
@@ -273,6 +274,7 @@
             @endif
         @endforeach
     @endif
+    </div>
 @endsection
 
 @push('scripts')
@@ -324,11 +326,13 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Track state locally for pending users so we know when it changes
             let userEmailStatuses = {};
+            let knownUserIds = [];
             
-            // Inisialisasi state awal (hanya ngambil dari DOM yang unverified)
+            // Inisialisasi state awal (hanya ngambil dari DOM yang unverified/pending)
             document.querySelectorAll('[id^="email-badge-"]').forEach(badge => {
-                let userId = badge.id.replace('email-badge-', '');
+                let userId = parseInt(badge.id.replace('email-badge-', ''));
                 userEmailStatuses[userId] = badge.classList.contains('badge-success'); // true = verified
+                knownUserIds.push(userId);
             });
 
             const notifSound = document.getElementById('notif-sound');
@@ -338,39 +342,70 @@
                 fetch('{{ route("users.polling") }}')
                     .then(response => response.json())
                     .then(data => {
+                        let incomingIds = data.users.map(u => u.id);
+                        
+                        // Check for brand new users that are not in our known DOM
+                        let hasNewUser = incomingIds.some(id => !knownUserIds.includes(id));
+
+                        if (hasNewUser) {
+                            // Mainkan suara ting
+                            notifSound.play().catch(e => console.log('Audio play di-block browser:', e));
+                            
+                            // Ambil HTML halaman baru secara diam-diam (PJAX)
+                            fetch(window.location.href)
+                                .then(res => res.text())
+                                .then(html => {
+                                    let doc = new DOMParser().parseFromString(html, 'text/html');
+                                    let newContainer = doc.getElementById('live-users-container');
+                                    if(newContainer) {
+                                        document.getElementById('live-users-container').innerHTML = newContainer.innerHTML;
+                                        
+                                        // Update state lokal
+                                        knownUserIds = incomingIds;
+                                        data.users.forEach(u => {
+                                            userEmailStatuses[u.id] = u.email_verified_at !== null;
+                                        });
+
+                                        // Beri highlight sejenak di baris pertama
+                                        let tbody = document.querySelector('tbody');
+                                        if(tbody && tbody.firstElementChild) {
+                                            tbody.firstElementChild.style.transition = "background-color 0.5s ease";
+                                            tbody.firstElementChild.style.backgroundColor = "#d4edda";
+                                            setTimeout(() => { tbody.firstElementChild.style.backgroundColor = "transparent"; }, 2000);
+                                        }
+                                    }
+                                });
+                            return; // Stop di sini, biarkan HTML baru dirender
+                        }
+
+                        // Jika tidak ada user baru, cukup update status email (seperti sebelumnya)
                         data.users.forEach(user => {
                             let badge = document.getElementById('email-badge-' + user.id);
                             let btnApprove = document.getElementById('btn-approve-' + user.id);
                             
-                            // Check jika DOM elemen ada di layar
                             if (badge) {
                                 let isVerifiedNow = user.email_verified_at !== null;
                                 let wasVerifiedBefore = userEmailStatuses[user.id];
 
                                 // Jika tadinya Unverified dan sekarang Verified
                                 if (!wasVerifiedBefore && isVerifiedNow) {
-                                    // Mainkan suara ting
-                                    notifSound.play().catch(e => console.log('Audio play di-block browser sebelum ada interaksi:', e));
+                                    notifSound.play().catch(e => console.log('Audio play di-block browser:', e));
                                     
-                                    // Update UI Badge ke Hijau
                                     badge.className = 'badge badge-success';
                                     badge.textContent = 'Verified';
                                     
-                                    // Beri animasi glow kuning sebentar
                                     let cell = document.getElementById('email-cell-' + user.id);
                                     if(cell) {
                                         cell.style.transition = "background-color 0.5s ease";
-                                        cell.style.backgroundColor = "#fff3cd"; // warning/yellow glow
+                                        cell.style.backgroundColor = "#fff3cd"; 
                                         setTimeout(() => { cell.style.backgroundColor = "transparent"; }, 2000);
                                     }
 
-                                    // Aktifkan tombol Approve
                                     if(btnApprove) {
                                         btnApprove.disabled = false;
                                         btnApprove.title = 'Setujui';
                                     }
 
-                                    // Update state lokal
                                     userEmailStatuses[user.id] = true;
                                 }
                             }
