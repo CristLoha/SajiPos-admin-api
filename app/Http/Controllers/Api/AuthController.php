@@ -63,6 +63,7 @@ class AuthController extends Controller
                         'name' => $validated['nama_lengkap'],
                         'username' => $validated['username'],
                         'password' => Hash::make($validated['password']),
+                        'status_akun' => 'pending_approval', // WAJIB DIRESET ke pending
                         'otp_code' => $otpCode,
                         'otp_expires_at' => now()->addMinutes(10),
                     ]);
