@@ -1,58 +1,138 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
-
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="public/img/sajipos-logo.jpg" width="150" alt="SajiPOS Logo" style="border-radius: 20px;">
 </p>
 
-## About Laravel
+<h1 align="center">SajiPOS Backend API & Admin Dashboard</h1>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+<p align="center">
+  Aplikasi backend komprehensif untuk sistem <strong>Point of Sale (POS) Restoran</strong>. Dibangun menggunakan <strong>Laravel</strong>, menyediakan RESTful API untuk aplikasi kasir (Flutter/Mobile) dan Dashboard Admin yang dilengkapi dengan fitur Real-Time Smart Polling, OTP Email Verification, serta integrasi Payment Gateway Xendit.
+</p>
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## ✨ Fitur Unggulan
 
-## Learning Laravel
+### 🔒 1. Sistem Autentikasi & Keamanan Canggih
+- **Laravel Sanctum Token:** Sistem login API yang aman untuk frontend kasir.
+- **OTP Email Verification:** Mengirim kode 6 digit warna-warni secara otomatis ke email pengguna (menggunakan konfigurasi SMTP kustom).
+- **Two-Tier Approval System:** Akun yang mendaftar harus melakukan verifikasi email terlebih dahulu, baru kemudian disetujui (Approve) secara manual oleh Admin.
+- **Password & Username Generator:** Endpoint API khusus (`GET /api/suggestions/credentials`) untuk men-generate username unik dan passphrase yang aman.
+- **Strict Password Validation:** Wajib menggunakan kombinasi huruf besar, kecil, dan angka tanpa menyulitkan dengan simbol.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 💻 2. Real-Time Admin Dashboard (Stisla UI)
+- **Smart Polling Architecture:** Admin dashboard akan memonitor pendaftar baru secara real-time setiap 5 detik melalui request AJAX/PJAX yang sangat ringan.
+- **Audio Notification:** Suara notifikasi "Ting" kasir akan otomatis berbunyi ketika ada pendaftar baru atau saat kasir berhasil memverifikasi email.
+- **Browser Tab Badge:** Notifikasi ala Facebook di tab browser (misal: `(2) Approval Users — SajiPOS`) jika ada kasir yang menunggu persetujuan.
+- **Seamless DOM Replacement:** Tabel akan ter-update seketika (menambahkan baris baru, animasi *glow*, dan membuka kunci tombol aksi) tanpa perlu *refresh* halaman (Zero Flicker).
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 💳 3. Integrasi Payment Gateway (Xendit)
+- Pembuatan *Invoice* otomatis dari pesanan pelanggan.
+- **Xendit Webhook (`/api/xendit/webhook`):** Sinkronisasi status pembayaran secara real-time dari server Xendit ke sistem SajiPOS tanpa perlu dicek manual.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### 📦 4. Manajemen Master Data & Order
+- **Produk & Kategori:** CRUD lengkap melalui panel admin, serta API terpisah untuk ditampilkan di kasir.
+- **Diskon & Campaign:** Sistem voucher, potongan harga, dan campaign promosi aktif.
+- **Kalkulasi Pesanan:** Endpoint pintar untuk menghitung Subtotal, Pajak, Diskon, dan Total Harga sebelum checkout.
 
-## Agentic Development
+### 📊 5. Analitik & Laporan
+- **Menu Terlaris:** Menampilkan produk paling laku (Harian / Sepanjang Waktu) melalui API.
+- **Laporan Transaksi:** Laporan penjualan lengkap berdasarkan filter waktu.
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+---
 
-```bash
-composer require laravel/boost --dev
+## 🛠️ Tech Stack
+- **Framework:** Laravel 11.x / 10.x
+- **Authentication:** Laravel Sanctum
+- **Database:** MySQL
+- **Template Admin:** [Stisla](https://getstisla.com/)
+- **Mailing:** Custom SMTP (Gmail / Mailtrap)
+- **Payment Gateway:** Xendit PHP SDK
 
-php artisan boost:install
-```
+---
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## 🚀 Cara Instalasi (Development)
 
-## Contributing
+1. **Clone Repository**
+   ```bash
+   git clone https://github.com/CristLoha/SajiPos-admin-api.git
+   cd SajiPos-admin-api
+   ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+2. **Install Dependencies**
+   ```bash
+   composer install
+   ```
 
-## Code of Conduct
+3. **Setup Environment**
+   Salin file konfigurasi *environment*:
+   ```bash
+   cp .env.example .env
+   ```
+   Buka file `.env` dan atur konfigurasi database, SMTP Email, dan Xendit:
+   ```env
+   APP_NAME="Tim SajiPOS"
+   APP_URL=http://localhost:8000
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=sajipos_db
+   DB_USERNAME=root
+   DB_PASSWORD=
 
-## Security Vulnerabilities
+   # SMTP Setup (Untuk Kirim OTP)
+   MAIL_MAILER=smtp
+   MAIL_HOST=smtp.gmail.com
+   MAIL_PORT=465
+   MAIL_USERNAME=email.anda@gmail.com
+   MAIL_PASSWORD="sandi_aplikasi_google_16_huruf"
+   MAIL_ENCRYPTION=smtps
+   MAIL_FROM_ADDRESS="email.anda@gmail.com"
+   MAIL_FROM_NAME="${APP_NAME}"
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+   # Xendit Keys
+   XENDIT_SECRET_KEY=xnd_development_...
+   ```
 
-## License
+4. **Generate App Key**
+   ```bash
+   php artisan key:generate
+   ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+5. **Migrate Database & Seeder**
+   ```bash
+   php artisan migrate --seed
+   ```
+
+6. **Jalankan Server Lokal**
+   ```bash
+   php artisan serve
+   ```
+   > Dashboard Admin dapat diakses di: `http://localhost:8000/login`
+
+---
+
+## 📡 Dokumentasi Endpoint API Penting
+
+### Authentication & Akun
+- `POST /api/register` : Mendaftar akun baru dan otomatis mengirim OTP ke email.
+- `POST /api/verify-email` : Memasukkan kode OTP 6 digit.
+- `POST /api/resend-otp` : Mengirim ulang kode verifikasi.
+- `GET /api/suggestions/credentials` : Meminta saran kombinasi Username dan Password aman.
+- `POST /api/login` : Mendapatkan Sanctum Bearer Token.
+
+### Transaksi & Pesanan
+- `POST /api/orders/hitung-total` : Menghitung harga keranjang belanja.
+- `POST /api/orders` : Menyimpan pesanan dan membuat koneksi ke Xendit.
+- `GET /api/orders/{id}/check-status` : Mengecek status pembayaran pesanan.
+- `POST /api/xendit/webhook` : Endpoint yang menerima ping (update) dari Xendit.
+
+### Master Data
+- `GET /api/categories` : List Kategori.
+- `GET /api/products` : List Produk.
+- `GET /api/discounts/available` : List Diskon aktif.
+- `GET /api/menu-terlaris` : Top Menu Analytics.
+
+---
+> Dikembangkan sebagai Portofolio Sistem Informasi Restoran Profesional.  
+> **© 2026 Tim SajiPOS.**
