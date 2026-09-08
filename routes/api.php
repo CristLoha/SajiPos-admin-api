@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [\App\Http\Controllers\Api\AuthController::class, 'register']);
+Route::get('/suggestions/credentials', [\App\Http\Controllers\Api\AuthController::class, 'generateSuggestions']);
 Route::post('/verify-email', [\App\Http\Controllers\Api\AuthController::class, 'verifyEmail']);
 Route::post('/resend-otp', [\App\Http\Controllers\Api\AuthController::class, 'resendOtp']);
 Route::post('/login', [\App\Http\Controllers\Api\AuthController::class, 'login'])->middleware('throttle:5,1');

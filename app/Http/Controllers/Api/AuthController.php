@@ -20,7 +20,18 @@ class AuthController extends Controller
             'nama_lengkap' => 'required|string|max:255',
             'username' => 'required|string|max:50|unique:users,username',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/[a-z]/', // harus ada huruf kecil
+                'regex:/[A-Z]/', // harus ada huruf besar
+                'regex:/[0-9]/', // harus ada angka
+                'confirmed'
+            ],
+        ], [
+            'password.regex' => 'Password harus mengandung huruf besar, huruf kecil, dan angka.',
+            'password.min' => 'Password minimal 8 karakter.',
         ]);
 
         $otpCode = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
@@ -205,6 +216,41 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Logout berhasil!'
+        ], 200);
+    }
+
+    /**
+     * Generate username & secure password suggestions
+     * GET /api/suggestions/credentials
+     */
+    public function generateSuggestions(Request $request)
+    {
+        $namaLengkap = $request->input('nama_lengkap', 'Kasir');
+
+        // Generate Username (format: namakacil + 3 angka acak)
+        $baseUsername = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $namaLengkap));
+        if (strlen($baseUsername) < 3) $baseUsername = "user";
+        
+        $username = $baseUsername . rand(100, 999);
+        while (User::where('username', $username)->exists()) {
+            $username = $baseUsername . rand(100, 999);
+        }
+
+        // Generate Password (Min 8 char, Huruf Besar, Huruf Kecil, Angka)
+        // Format: NamaCapital + "Pos" + 3 angka
+        $baseName = ucfirst(preg_replace('/[^a-zA-Z]/', '', $namaLengkap));
+        if (strlen($baseName) < 3) $baseName = "Saji";
+        $baseName = substr($baseName, 0, 5); // Biar nggak kepanjangan
+        
+        $password = ucfirst($baseName) . 'Pos' . rand(100, 999);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Saran username dan password berhasil dibuat.',
+            'data' => [
+                'username' => $username,
+                'password' => $password
+            ]
         ], 200);
     }
 }
