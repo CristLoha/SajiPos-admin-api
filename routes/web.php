@@ -20,6 +20,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/home', [App\Http\Controllers\DashboardController::class, 'index'])->name('home')->middleware('role:admin,staff,user');
 
     // Users — hanya admin yang boleh akses kelola user
+    Route::get('users/polling', [UserController::class, 'polling'])->name('users.polling')->middleware('role:admin,staff');
     Route::resource('users', UserController::class)->middleware('role:admin');
     Route::post('users/{id}/approve', [UserController::class, 'approve'])->name('users.approve')->middleware('role:admin');
     Route::post('users/{id}/reject', [UserController::class, 'reject'])->name('users.reject')->middleware('role:admin');

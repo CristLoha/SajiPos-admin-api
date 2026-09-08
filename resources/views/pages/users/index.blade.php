@@ -87,6 +87,7 @@
                                                 <th class="text-center" style="width: 50px;">No</th>
                                                 <th>Nama</th>
                                                 <th>Username / Email</th>
+                                                <th class="text-center">Email</th>
                                                 <th class="text-center">Status</th>
                                                 <th class="text-center">Role</th>
                                                 <th>Dibuat</th>
@@ -109,6 +110,13 @@
                                                     <td>
                                                         <code>{{ $user->username }}</code><br>
                                                         <small class="text-muted">{{ $user->email }}</small>
+                                                    </td>
+                                                    <td class="text-center" id="email-cell-{{ $user->id }}">
+                                                        @if($user->email_verified_at)
+                                                            <span class="badge badge-success" id="email-badge-{{ $user->id }}">Verified</span>
+                                                        @else
+                                                            <span class="badge badge-light text-muted" id="email-badge-{{ $user->id }}">Unverified</span>
+                                                        @endif
                                                     </td>
                                                     <td class="text-center">
                                                         @if($user->status_akun == 'pending_approval')
@@ -135,7 +143,7 @@
                                                         @if (auth()->user()->roles == 'admin')
                                                             <div class="d-flex justify-content-center">
                                                                 @if($user->status_akun == 'pending_approval')
-                                                                    <button class="btn btn-sm btn-success btn-icon mr-1" data-toggle="modal" data-target="#approveModal{{ $user->id }}" title="Setujui">
+                                                                    <button id="btn-approve-{{ $user->id }}" class="btn btn-sm btn-success btn-icon mr-1" data-toggle="modal" data-target="#approveModal{{ $user->id }}" title="{{ $user->email_verified_at ? 'Setujui' : 'Email Belum Diverifikasi' }}" {{ $user->email_verified_at ? '' : 'disabled' }}>
                                                                         <i class="fas fa-check"></i>
                                                                     </button>
                                                                     <button class="btn btn-sm btn-warning btn-icon mr-1" data-toggle="modal" data-target="#rejectModal{{ $user->id }}" title="Tolak">
@@ -303,6 +311,76 @@
                     });
                 });
             });
+        });
+    </script>
+
+    <!-- Audio Element for Notification -->
+    <audio id="notif-sound" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Smart Polling Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Track state locally for pending users so we know when it changes
+            let userEmailStatuses = {};
+            
+            // Inisialisasi state awal (hanya ngambil dari DOM yang unverified)
+            document.querySelectorAll('[id^="email-badge-"]').forEach(badge => {
+                let userId = badge.id.replace('email-badge-', '');
+                userEmailStatuses[userId] = badge.classList.contains('badge-success'); // true = verified
+            });
+
+            const notifSound = document.getElementById('notif-sound');
+
+            // Polling function
+            function pollUserStatus() {
+                fetch('{{ route("users.polling") }}')
+                    .then(response => response.json())
+                    .then(data => {
+                        data.users.forEach(user => {
+                            let badge = document.getElementById('email-badge-' + user.id);
+                            let btnApprove = document.getElementById('btn-approve-' + user.id);
+                            
+                            // Check jika DOM elemen ada di layar
+                            if (badge) {
+                                let isVerifiedNow = user.email_verified_at !== null;
+                                let wasVerifiedBefore = userEmailStatuses[user.id];
+
+                                // Jika tadinya Unverified dan sekarang Verified
+                                if (!wasVerifiedBefore && isVerifiedNow) {
+                                    // Mainkan suara ting
+                                    notifSound.play().catch(e => console.log('Audio play di-block browser sebelum ada interaksi:', e));
+                                    
+                                    // Update UI Badge ke Hijau
+                                    badge.className = 'badge badge-success';
+                                    badge.textContent = 'Verified';
+                                    
+                                    // Beri animasi glow kuning sebentar
+                                    let cell = document.getElementById('email-cell-' + user.id);
+                                    if(cell) {
+                                        cell.style.transition = "background-color 0.5s ease";
+                                        cell.style.backgroundColor = "#fff3cd"; // warning/yellow glow
+                                        setTimeout(() => { cell.style.backgroundColor = "transparent"; }, 2000);
+                                    }
+
+                                    // Aktifkan tombol Approve
+                                    if(btnApprove) {
+                                        btnApprove.disabled = false;
+                                        btnApprove.title = 'Setujui';
+                                    }
+
+                                    // Update state lokal
+                                    userEmailStatuses[user.id] = true;
+                                }
+                            }
+                        });
+                    })
+                    .catch(err => console.error("Polling error:", err));
+            }
+
+            // Jalankan polling setiap 5 detik
+            setInterval(pollUserStatus, 5000);
         });
     </script>
 @endpush

@@ -15,6 +15,16 @@ class UserController extends Controller
             abort(403, 'Hanya admin yang bisa melakukan aksi ini.');
         }
     }
+    // polling status email (lightweight)
+    public function polling()
+    {
+        // Hanya ambil data id dan status email dari user yang masih pending
+        $users = User::where('status_akun', 'pending_approval')
+            ->get(['id', 'email_verified_at']);
+            
+        return response()->json(['users' => $users]);
+    }
+
     // index
     public function index(Request $request)
     {
