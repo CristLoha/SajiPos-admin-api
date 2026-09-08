@@ -256,27 +256,20 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Pendaftaran Anda ditolak.',
-                'alasan' => $user->rejection_reason
+                        'alasan' => $user->rejection_reason
             ], 403);
         }
 
         // ==========================================
-        // FITUR DEVICE BINDING (Kunci Perangkat)
+        // FITUR SINGLE ACTIVE SESSION (Anti Multi-Login)
         // ==========================================
+        // Hapus semua token lama milik user ini. 
+        // Efeknya: Jika dia login di HP B, maka HP A akan otomatis ter-logout (dapat 401 Unauthorized)
+        $user->tokens()->delete();
+
+        // (Opsional) Tetap catat device_id terakhir untuk riwayat/keamanan tanpa ngeblokir
         if ($request->has('device_id') && !empty($request->device_id)) {
-            $incomingDeviceId = $request->device_id;
-            
-            // Jika device_id di database masih kosong, KUNCI akun ini ke device_id tersebut
-            if (empty($user->device_id)) {
-                $user->update(['device_id' => $incomingDeviceId]);
-            } 
-            // Jika device_id di database sudah ada, CEK apakah cocok
-            else if ($user->device_id !== $incomingDeviceId) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Akses Ditolak: Akun ini sudah tertaut dengan perangkat lain. Hubungi Admin jika Anda mengganti perangkat.'
-                ], 403);
-            }
+            $user->update(['device_id' => $request->device_id]);
         }
         // ==========================================
 

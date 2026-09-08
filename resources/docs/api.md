@@ -165,7 +165,7 @@ Meminta sistem membuat kode OTP baru dan mengirimkan ulang ke email jika tidak m
 ### F. POST Login Kasir
 
 Melakukan login dengan menggunakan email atau username.
-**PENTING (Device Binding):** Disarankan mengirimkan `device_id` (IMEI/UUID) untuk mengunci akun pada satu perangkat fisik. Jika akun diakses dari perangkat lain, sistem akan menolak (403).
+**PENTING (Single Active Session):** Aplikasi ini menerapkan sistem Anti Multi-Login. Saat kasir berhasil login, semua sesi di perangkat lain akan otomatis diputus (Token Expired/401). Parameter `device_id` opsional hanya untuk pencatatan keamanan.
 
 -   **URL:** `/login`
 -   **Method:** `POST`
