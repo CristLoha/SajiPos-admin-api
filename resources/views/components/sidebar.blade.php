@@ -17,19 +17,10 @@
 
             @if(auth()->user()->roles == 'admin' || auth()->user()->roles == 'staff')
             @php $pendingUsers = \App\Models\User::where('status_akun', 'pending_approval')->count(); @endphp
-            <li class="{{ Request::is('users*') && request('status') != 'pending_approval' ? 'active' : '' }}">
+            <li class="{{ Request::is('users*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('users.index') }}">
                     <i class="fas fa-users"></i>
-                    <span>Semua Users</span>
-                </a>
-            </li>
-            @endif
-
-            @if(auth()->user()->roles == 'admin')
-            <li class="{{ request('status') == 'pending_approval' ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('users.index', ['status' => 'pending_approval']) }}">
-                    <i class="fas fa-user-check"></i>
-                    <span>Approval User</span>
+                    <span>Users</span>
                     @if($pendingUsers > 0)
                         <span class="badge badge-warning ml-auto">{{ $pendingUsers }}</span>
                     @endif

@@ -11,8 +11,8 @@
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>{{ request('status') == 'pending_approval' ? 'Approval Users' : 'Manajemen Users' }}</h1>
-                @if (auth()->user()->roles == 'admin' && request('status') != 'pending_approval')
+                <h1>{{ request('status') ? 'Approval Users' : 'Manajemen Users' }}</h1>
+                @if (auth()->user()->roles == 'admin' && !request('status'))
                     <div class="section-header-button">
                         <a href="{{ route('users.create') }}" class="btn btn-primary">
                             <i class="fas fa-plus mr-1"></i>Tambah User
