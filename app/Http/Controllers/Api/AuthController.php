@@ -58,8 +58,10 @@ class AuthController extends Controller
             \Illuminate\Support\Facades\Log::error('Gagal kirim email OTP (Transaction Rollback): ' . $e->getMessage());
             
             return response()->json([
-                'success' => false,
-                'message' => 'Email tidak valid, tidak terdaftar, atau server gagal mengirim pesan. Silakan pastikan alamat email benar-benar aktif.'
+                'message' => 'Email tidak valid, tidak terdaftar, atau server gagal mengirim pesan.',
+                'errors' => [
+                    'email' => ['Alamat email ini tidak dapat menerima pesan. Pastikan email benar-benar aktif.']
+                ]
             ], 422);
         }
 
@@ -174,8 +176,10 @@ class AuthController extends Controller
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Gagal resend email OTP: ' . $e->getMessage());
             return response()->json([
-                'success' => false, 
-                'message' => 'Email gagal dikirim. Pastikan alamat email benar-benar aktif atau coba gunakan email lain.'
+                'message' => 'Email gagal dikirim.',
+                'errors' => [
+                    'email' => ['Alamat email ini tidak dapat menerima pesan. Pastikan email benar-benar aktif.']
+                ]
             ], 422);
         }
 
