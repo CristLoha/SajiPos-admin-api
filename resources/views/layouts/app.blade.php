@@ -135,8 +135,8 @@
                         .catch(err => console.error("Global polling error:", err));
                 }
 
-                // Run polling every 15 seconds to prevent server overload (DDoS)
-                setInterval(pollGlobalStatus, 15000);
+                // Run polling every 5 seconds biar INSTANT (tapi jangan buka banyak tab Admin ya!)
+                setInterval(pollGlobalStatus, 5000);
                 // Run once on load to init
                 pollGlobalStatus();
             });
