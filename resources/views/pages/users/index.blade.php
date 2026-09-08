@@ -144,9 +144,15 @@
                                                         @if (auth()->user()->roles == 'admin')
                                                             <div class="d-flex justify-content-center">
                                                                 @if($user->status_akun == 'pending_approval')
-                                                                    <button id="btn-approve-{{ $user->id }}" class="btn btn-sm btn-success btn-icon mr-1" data-toggle="modal" data-target="#approveModal{{ $user->id }}" title="{{ $user->email_verified_at ? 'Setujui' : 'Email Belum Diverifikasi' }}" {{ $user->email_verified_at ? '' : 'disabled' }}>
-                                                                        <i class="fas fa-check"></i>
-                                                                    </button>
+                                                                    @if($user->email_verified_at)
+                                                                        <button id="btn-approve-{{ $user->id }}" class="btn btn-sm btn-success btn-icon mr-1" data-toggle="modal" data-target="#approveModal{{ $user->id }}" title="Setujui">
+                                                                            <i class="fas fa-check"></i>
+                                                                        </button>
+                                                                    @else
+                                                                        <button id="btn-approve-{{ $user->id }}" class="btn btn-sm btn-secondary btn-icon mr-1" onclick="swal('Belum Verifikasi OTP!', 'Kasir ini belum memverifikasi kode OTP dari emailnya. Anda baru bisa menyetujui akun ini setelah status email menjadi Verified.', 'warning')" title="Email Belum Diverifikasi">
+                                                                            <i class="fas fa-check"></i>
+                                                                        </button>
+                                                                    @endif
                                                                     <button class="btn btn-sm btn-warning btn-icon mr-1" data-toggle="modal" data-target="#rejectModal{{ $user->id }}" title="Tolak">
                                                                         <i class="fas fa-times"></i>
                                                                     </button>
