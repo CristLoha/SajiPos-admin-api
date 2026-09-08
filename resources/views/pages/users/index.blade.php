@@ -11,8 +11,8 @@
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>Manajemen Users</h1>
-                @if (auth()->user()->roles == 'admin')
+                <h1>{{ request('status') == 'pending_approval' ? 'Approval Users' : 'Manajemen Users' }}</h1>
+                @if (auth()->user()->roles == 'admin' && request('status') != 'pending_approval')
                     <div class="section-header-button">
                         <a href="{{ route('users.create') }}" class="btn btn-primary">
                             <i class="fas fa-plus mr-1"></i>Tambah User
@@ -22,7 +22,7 @@
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="#">Dashboard</a></div>
                     <div class="breadcrumb-item"><a href="{{ route('users.index') }}">Users</a></div>
-                    <div class="breadcrumb-item">Semua Users</div>
+                    <div class="breadcrumb-item">{{ request('status') == 'pending_approval' ? 'Approval' : 'Semua Users' }}</div>
                 </div>
             </div>
             <div class="section-body">
@@ -31,16 +31,16 @@
                         @include('layouts.alert')
                     </div>
                 </div>
-                <h2 class="section-title">Users</h2>
+                <h2 class="section-title">{{ request('status') == 'pending_approval' ? 'Approval Users' : 'Users' }}</h2>
                 <p class="section-lead">
-                    Kelola semua pengguna sistem, termasuk menambah, mengedit, dan menghapus.
+                    {{ request('status') == 'pending_approval' ? 'Review dan setujui atau tolak pendaftaran user baru.' : 'Kelola semua pengguna sistem, termasuk menambah, mengedit, dan menghapus.' }}
                 </p>
 
                 <div class="row mt-4">
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4>Semua Users</h4>
+                                <h4>{{ request('status') == 'pending_approval' ? 'Antrian Approval' : 'Semua Users' }}</h4>
                             </div>
                             <div class="card-body">
                                 <div class="row mb-3">
