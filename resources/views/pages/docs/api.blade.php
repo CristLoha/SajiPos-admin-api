@@ -371,7 +371,7 @@
                 <!-- Zero-MD menggunakan no-shadow agar styling custom CSS di atas berfungsi -->
                 <zero-md id="md-renderer" no-shadow>
                     <script type="text/markdown">
-{!! file_get_contents(resource_path('docs/api.md')) !!}
+{!! file_get_contents(base_path('API_DOCUMENTATION.md')) !!}
                     </script>
                 </zero-md>
             </div>
