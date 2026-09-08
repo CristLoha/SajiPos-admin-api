@@ -5,6 +5,14 @@
 <h1 align="center">SajiPOS Backend API & Admin Dashboard</h1>
 
 <p align="center">
+  <img src="https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel">
+  <img src="https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP">
+  <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL">
+  <img src="https://img.shields.io/badge/Flutter_API-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter API">
+  <img src="https://img.shields.io/badge/Status-Active_Development-brightgreen?style=for-the-badge" alt="Status">
+</p>
+
+<p align="center">
   Aplikasi backend komprehensif untuk sistem <strong>Point of Sale (POS) Restoran</strong>. Dibangun menggunakan <strong>Laravel</strong>, menyediakan RESTful API untuk aplikasi kasir (Flutter/Mobile) dan Dashboard Admin yang dilengkapi dengan fitur Real-Time Smart Polling, OTP Email Verification, serta integrasi Payment Gateway Xendit.
 </p>
 
@@ -113,6 +121,9 @@
 ---
 
 ## 📡 Dokumentasi Endpoint API Penting
+
+Silakan lihat dokumentasi lengkap di file `API_DOCUMENTATION.md` untuk detail lengkap *request body* dan *response*.
+Beberapa endpoint utama meliputi:
 
 ### Authentication & Akun
 - `POST /api/register` : Mendaftar akun baru dan otomatis mengirim OTP ke email.
