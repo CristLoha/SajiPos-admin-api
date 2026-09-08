@@ -18,8 +18,8 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'nama_lengkap' => 'required|string|max:255',
-            'username' => 'required|string|max:50|unique:users,username',
-            'email' => 'required|email:rfc,dns|unique:users,email',
+            'username' => 'required|string|max:50', // unique dicek manual
+            'email' => 'required|email:rfc,dns', // unique dicek manual
             'password' => [
                 'required',
                 'string',
@@ -35,24 +35,55 @@ class AuthController extends Controller
             'email.email' => 'Format email tidak valid atau domain tidak ditemukan.',
         ]);
 
+        // Cek apakah email sudah ada
+        $existingEmail = User::where('email', $validated['email'])->first();
+        if ($existingEmail && $existingEmail->email_verified_at !== null) {
+            return response()->json([
+                'message' => 'Data tidak valid.',
+                'errors' => ['email' => ['Email ini sudah terdaftar dan terverifikasi.']]
+            ], 422);
+        }
+
+        // Cek apakah username sudah dipakai orang lain
+        $existingUsername = User::where('username', $validated['username'])->first();
+        if ($existingUsername && (!$existingEmail || $existingUsername->id !== $existingEmail->id)) {
+            return response()->json([
+                'message' => 'Data tidak valid.',
+                'errors' => ['username' => ['Username ini sudah digunakan. Silakan pilih username lain.']]
+            ], 422);
+        }
+
         $otpCode = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
 
         try {
-            $user = \Illuminate\Support\Facades\DB::transaction(function () use ($validated, $otpCode) {
-                $newUser = User::create([
-                    'name' => $validated['nama_lengkap'],
-                    'email' => $validated['email'],
-                    'username' => $validated['username'],
-                    'password' => Hash::make($validated['password']),
-                    'roles' => 'user', // default role adalah kasir
-                    'status_akun' => 'pending_approval',
-                    'otp_code' => $otpCode,
-                    'otp_expires_at' => now()->addMinutes(10),
-                ]);
+            $user = \Illuminate\Support\Facades\DB::transaction(function () use ($validated, $otpCode, $existingEmail) {
+                if ($existingEmail) {
+                    // JALAN NINJA: Timpa data user lama yang belum diverifikasi
+                    $existingEmail->update([
+                        'name' => $validated['nama_lengkap'],
+                        'username' => $validated['username'],
+                        'password' => Hash::make($validated['password']),
+                        'otp_code' => $otpCode,
+                        'otp_expires_at' => now()->addMinutes(10),
+                    ]);
+                    $user = $existingEmail;
+                } else {
+                    // Buat user baru
+                    $user = User::create([
+                        'name' => $validated['nama_lengkap'],
+                        'email' => $validated['email'],
+                        'username' => $validated['username'],
+                        'password' => Hash::make($validated['password']),
+                        'roles' => 'user', // default role adalah kasir
+                        'status_akun' => 'pending_approval',
+                        'otp_code' => $otpCode,
+                        'otp_expires_at' => now()->addMinutes(10),
+                    ]);
+                }
 
-                \Illuminate\Support\Facades\Mail::to($newUser->email)->send(new \App\Mail\OtpMail($newUser, $otpCode));
+                \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\OtpMail($user, $otpCode));
 
-                return $newUser;
+                return $user;
             });
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Gagal kirim email OTP (Transaction Rollback): ' . $e->getMessage());
