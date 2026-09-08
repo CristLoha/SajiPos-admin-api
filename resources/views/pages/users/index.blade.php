@@ -336,6 +336,7 @@
             });
 
             const notifSound = document.getElementById('notif-sound');
+            notifSound.volume = 0.3; // Set volume jadi 30% biar nggak bikin kaget
             let baseTitle = document.title.replace(/^\(\d+\)\s+/, ''); // Simpan judul asli tab
 
             // Polling function
