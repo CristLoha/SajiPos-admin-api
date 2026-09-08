@@ -149,7 +149,7 @@
                                                                             <i class="fas fa-check"></i>
                                                                         </button>
                                                                     @else
-                                                                        <button id="btn-approve-{{ $user->id }}" class="btn btn-sm btn-secondary btn-icon mr-1" onclick="swal('Belum Verifikasi OTP!', 'Kasir ini belum memverifikasi kode OTP dari emailnya. Anda baru bisa menyetujui akun ini setelah status email menjadi Verified.', 'warning')" title="Email Belum Diverifikasi">
+                                                                        <button id="btn-approve-{{ $user->id }}" class="btn btn-sm btn-secondary btn-icon mr-1" onclick="if(typeof Swal !== 'undefined') { Swal.fire('Belum Verifikasi OTP!', 'Kasir ini belum memverifikasi kode OTP dari emailnya. Anda baru bisa menyetujui akun ini setelah status email menjadi Verified.', 'warning'); } else if(typeof swal !== 'undefined') { swal('Belum Verifikasi OTP!', 'Kasir ini belum memverifikasi kode OTP...', 'warning'); } else { alert('Belum Verifikasi OTP! Kasir ini belum memverifikasi kode OTP dari emailnya.'); }" title="Email Belum Diverifikasi">
                                                                             <i class="fas fa-check"></i>
                                                                         </button>
                                                                     @endif
