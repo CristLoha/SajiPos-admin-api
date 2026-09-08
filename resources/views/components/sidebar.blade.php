@@ -16,7 +16,7 @@
             <li class="menu-header">Manajemen</li>
 
             @if(auth()->user()->roles == 'admin' || auth()->user()->roles == 'staff')
-            @php $pendingUsers = \App\Models\User::where('status_akun', 'pending_approval')->count(); @endphp
+            @php $pendingUsers = \App\Models\User::where('status_akun', 'pending_approval')->whereNotNull('email_verified_at')->count(); @endphp
             <li class="{{ Request::is('users*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('users.index') }}">
                     <i class="fas fa-users"></i>

@@ -18,8 +18,9 @@ class UserController extends Controller
     // polling status email (lightweight)
     public function polling()
     {
-        // Hanya ambil data id dan status email dari user yang masih pending
+        // Hanya ambil data id dari user yang masih pending DAN SUDAH VERIFIKASI EMAIL
         $users = User::where('status_akun', 'pending_approval')
+            ->whereNotNull('email_verified_at')
             ->get(['id', 'email_verified_at']);
             
         return response()->json(['users' => $users]);
