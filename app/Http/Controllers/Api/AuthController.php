@@ -16,31 +16,30 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'username' => 'nullable|string|max:255|unique:users',
-            'password' => 'required|string|min:6',
+        $validated = $request->validate([
+            'nama_lengkap' => 'required|string|max:255',
+            'username' => 'required|string|max:50|unique:users,username',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'username' => $request->username,
-            'password' => Hash::make($request->password),
-            'roles' => 'staff', // automatically assigned as staff/kasir
-            'status' => 'pending', // awaits admin approval
+            'name' => $validated['nama_lengkap'],
+            'email' => $validated['email'],
+            'username' => $validated['username'],
+            'password' => Hash::make($validated['password']),
+            'roles' => null, // role ditentukan admin saat approve
+            'status_akun' => 'pending_approval',
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Pendaftaran berhasil. Akun Anda sedang menunggu persetujuan Admin.',
+            'message' => 'Pendaftaran berhasil, menunggu persetujuan admin.',
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
-                'status' => $user->status,
-                'role' => $user->roles,
+                'status_akun' => $user->status_akun,
             ]
         ], 201);
     }
@@ -68,21 +67,29 @@ class AuthController extends Controller
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Email/Username atau password salah.'
+                'message' => 'Username atau password salah.'
             ], 401);
         }
 
-        if ($user->status === 'pending') {
+        if ($user->status_akun === 'pending_approval') {
             return response()->json([
                 'success' => false,
                 'message' => 'Akun Anda sedang menunggu persetujuan Admin.'
             ], 403);
         }
 
-        if ($user->status === 'rejected') {
+        if ($user->status_akun === 'rejected') {
             return response()->json([
                 'success' => false,
-                'message' => 'Pendaftaran akun Anda ditolak oleh Admin.'
+                'message' => 'Pendaftaran Anda ditolak.',
+                'alasan' => $user->rejection_reason
+            ], 403);
+        }
+
+        if ($user->status_akun === 'nonaktif') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akun Anda telah dinonaktifkan.'
             ], 403);
         }
 

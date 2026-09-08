@@ -70,8 +70,9 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
 
         // Modifikasi Akses & Persetujuan Kasir
-        Route::get('users/cashiers', [\App\Http\Controllers\Api\UserController::class, 'getCashiers']);
-        Route::post('users/{id}/confirm', [\App\Http\Controllers\Api\UserController::class, 'confirmCashier']);
+        Route::get('users', [\App\Http\Controllers\Api\UserController::class, 'index']);
+        Route::post('users/{id}/approve', [\App\Http\Controllers\Api\UserController::class, 'approve']);
+        Route::post('users/{id}/reject', [\App\Http\Controllers\Api\UserController::class, 'reject']);
 
     });
 

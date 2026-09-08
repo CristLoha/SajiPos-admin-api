@@ -43,19 +43,42 @@
                                 <h4>Semua Users</h4>
                             </div>
                             <div class="card-body">
-                                <div class="float-right mb-3">
-                                    <form method="GET" action="{{ route('users.index') }}">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control" placeholder="Cari user..."
-                                                name="name" value="{{ request('name') }}">
-                                            <div class="input-group-append">
-                                                <button class="btn btn-primary"><i class="fas fa-search"></i></button>
-                                            </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <ul class="nav nav-pills">
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ request('status') == '' ? 'active' : '' }}" href="{{ route('users.index', ['name' => request('name')]) }}">Semua</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ request('status') == 'pending_approval' ? 'active' : '' }}" href="{{ route('users.index', ['status' => 'pending_approval', 'name' => request('name')]) }}">
+                                                    Pending <span class="badge badge-{{ request('status') == 'pending_approval' ? 'white' : 'primary' }}">{{ \App\Models\User::where('status_akun', 'pending_approval')->count() }}</span>
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ request('status') == 'approved' ? 'active' : '' }}" href="{{ route('users.index', ['status' => 'approved', 'name' => request('name')]) }}">Approved</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ request('status') == 'rejected' ? 'active' : '' }}" href="{{ route('users.index', ['status' => 'rejected', 'name' => request('name')]) }}">Rejected</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="float-right">
+                                            <form method="GET" action="{{ route('users.index') }}">
+                                                @if(request('status'))
+                                                    <input type="hidden" name="status" value="{{ request('status') }}">
+                                                @endif
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" placeholder="Cari user..."
+                                                        name="name" value="{{ request('name') }}">
+                                                    <div class="input-group-append">
+                                                        <button class="btn btn-primary"><i class="fas fa-search"></i></button>
+                                                    </div>
+                                                </div>
+                                            </form>
                                         </div>
-                                    </form>
+                                    </div>
                                 </div>
-
-                                <div class="clearfix mb-3"></div>
 
                                 <div class="table-responsive">
                                     <table class="table table-striped">
@@ -63,11 +86,11 @@
                                             <tr>
                                                 <th class="text-center" style="width: 50px;">No</th>
                                                 <th>Nama</th>
-                                                <th>Username</th>
-                                                <th>Email</th>
+                                                <th>Username / Email</th>
+                                                <th class="text-center">Status</th>
                                                 <th class="text-center">Role</th>
                                                 <th>Dibuat</th>
-                                                <th class="text-center" style="width: 180px;">Aksi</th>
+                                                <th class="text-center" style="width: 200px;">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -83,18 +106,43 @@
                                                             <span>{{ $user->name }}</span>
                                                         </div>
                                                     </td>
-                                                    <td><code>{{ $user->username }}</code></td>
-                                                    <td>{{ $user->email }}</td>
+                                                    <td>
+                                                        <code>{{ $user->username }}</code><br>
+                                                        <small class="text-muted">{{ $user->email }}</small>
+                                                    </td>
                                                     <td class="text-center">
-                                                        <span
-                                                            class="badge badge-{{ $user->roles == 'admin' ? 'danger' : ($user->roles == 'staff' ? 'warning' : 'primary') }}">
-                                                            {{ ucfirst($user->roles) }}
-                                                        </span>
+                                                        @if($user->status_akun == 'pending_approval')
+                                                            <span class="badge badge-warning">Pending</span>
+                                                        @elseif($user->status_akun == 'approved')
+                                                            <span class="badge badge-success">Approved</span>
+                                                        @elseif($user->status_akun == 'rejected')
+                                                            <span class="badge badge-danger">Rejected</span>
+                                                        @else
+                                                            <span class="badge badge-secondary">{{ ucfirst($user->status_akun) }}</span>
+                                                        @endif
+                                                    </td>
+                                                    <td class="text-center">
+                                                        @if($user->roles)
+                                                            <span class="badge badge-{{ $user->roles == 'admin' ? 'danger' : ($user->roles == 'staff' ? 'warning' : 'primary') }}">
+                                                                {{ ucfirst($user->roles) }}
+                                                            </span>
+                                                        @else
+                                                            <span class="text-muted">-</span>
+                                                        @endif
                                                     </td>
                                                     <td>{{ $user->created_at->format('d M Y') }}</td>
                                                     <td class="text-center">
                                                         @if (auth()->user()->roles == 'admin')
                                                             <div class="d-flex justify-content-center">
+                                                                @if($user->status_akun == 'pending_approval')
+                                                                    <button class="btn btn-sm btn-success btn-icon mr-1" data-toggle="modal" data-target="#approveModal{{ $user->id }}" title="Setujui">
+                                                                        <i class="fas fa-check"></i>
+                                                                    </button>
+                                                                    <button class="btn btn-sm btn-warning btn-icon mr-1" data-toggle="modal" data-target="#rejectModal{{ $user->id }}" title="Tolak">
+                                                                        <i class="fas fa-times"></i>
+                                                                    </button>
+                                                                @endif
+
                                                                 <a href="{{ route('users.edit', $user->id) }}"
                                                                     class="btn btn-sm btn-info btn-icon mr-1"
                                                                     data-toggle="tooltip" title="Edit User">
@@ -149,6 +197,74 @@
             </div>
         </section>
     </div>
+
+    <!-- Modals for Approve and Reject -->
+    @if(auth()->user()->roles == 'admin')
+        @foreach($users as $user)
+            @if($user->status_akun == 'pending_approval')
+                <!-- Approve Modal -->
+                <div class="modal fade" id="approveModal{{ $user->id }}" tabindex="-1" role="dialog" aria-labelledby="approveModalLabel{{ $user->id }}" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <form action="{{ route('users.approve', $user->id) }}" method="POST">
+                                @csrf
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="approveModalLabel{{ $user->id }}">Setujui User: {{ $user->name }}</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Pilih role untuk user ini:</p>
+                                    <div class="form-group">
+                                        <label>Role</label>
+                                        <select name="role" class="form-control selectric" required>
+                                            <option value="" disabled selected>Pilih Role...</option>
+                                            <option value="admin">Admin</option>
+                                            <option value="staff">Staff</option>
+                                            <option value="user">User (Kasir)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                    <button type="submit" class="btn btn-success">Setujui</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reject Modal -->
+                <div class="modal fade" id="rejectModal{{ $user->id }}" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel{{ $user->id }}" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <form action="{{ route('users.reject', $user->id) }}" method="POST">
+                                @csrf
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="rejectModalLabel{{ $user->id }}">Tolak User: {{ $user->name }}</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Berikan alasan penolakan:</p>
+                                    <div class="form-group">
+                                        <label>Alasan</label>
+                                        <textarea name="rejection_reason" class="form-control" rows="3" required></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                    <button type="submit" class="btn btn-danger">Tolak</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        @endforeach
+    @endif
 @endsection
 
 @push('scripts')

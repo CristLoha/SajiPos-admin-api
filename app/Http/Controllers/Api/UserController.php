@@ -9,59 +9,69 @@ use Illuminate\Http\Request;
 class UserController extends Controller
 {
     /**
-     * Get list of cashiers (staff) by status
-     * GET /api/users/cashiers?status=pending
+     * Get list of users (can filter by status)
+     * GET /api/users?status=pending_approval
      */
-    public function getCashiers(Request $request)
+    public function index(Request $request)
     {
-        $query = User::where('roles', 'staff');
+        $query = User::query();
 
         if ($request->has('status')) {
-            $query->where('status', $request->status);
+            $query->where('status_akun', $request->status);
         }
 
-        $cashiers = $query->get();
+        $users = $query->get();
 
         return response()->json([
             'success' => true,
-            'data' => $cashiers
+            'data' => $users
         ]);
     }
 
     /**
-     * Approve or reject a cashier
-     * POST /api/users/{id}/confirm
+     * Approve a user
+     * POST /api/users/{id}/approve
      */
-    public function confirmCashier(Request $request, $id)
+    public function approve(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|in:active,rejected'
+            'role' => 'required|in:admin,staff,user' // Using role enum instead of role_id
         ]);
 
-        $user = User::find($id);
-
-        if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User tidak ditemukan'
-            ], 404);
-        }
-
-        if ($user->roles !== 'staff') {
-            return response()->json([
-                'success' => false,
-                'message' => 'User ini bukan kasir/staff'
-            ], 400);
-        }
-
-        $user->status = $request->status;
-        $user->save();
-
-        $message = $request->status === 'active' ? 'Akun kasir berhasil disetujui.' : 'Akun kasir ditolak.';
+        $user = User::findOrFail($id);
+        $user->update([
+            'status_akun' => 'approved',
+            'roles'       => $request->role,
+            'approved_by' => auth()->id() ?? 1, // Fallback if no auth context
+            'approved_at' => now(),
+        ]);
 
         return response()->json([
             'success' => true,
-            'message' => $message,
+            'message' => 'User berhasil disetujui.',
+            'data' => $user
+        ]);
+    }
+
+    /**
+     * Reject a user
+     * POST /api/users/{id}/reject
+     */
+    public function reject(Request $request, $id)
+    {
+        $request->validate([
+            'rejection_reason' => 'required|string|max:500'
+        ]);
+
+        $user = User::findOrFail($id);
+        $user->update([
+            'status_akun'      => 'rejected',
+            'rejection_reason' => $request->rejection_reason,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User ditolak.',
             'data' => $user
         ]);
     }

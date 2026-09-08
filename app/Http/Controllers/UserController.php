@@ -23,10 +23,16 @@ class UserController extends Controller
             abort(403, 'Unauthorized. Hanya admin dan staff yang bisa melihat daftar user.');
         }
 
-        //get all users with search and pagination
+        //get all users with search, filter, and pagination
         $users = User::when($request->name, function ($query) use ($request) {
             $query->where('name', 'like', '%' . $request->name . '%');
-        })->paginate(10);
+        })
+        ->when($request->status, function ($query) use ($request) {
+            $query->where('status_akun', $request->status);
+        })
+        ->orderByRaw("FIELD(status_akun, 'pending_approval') DESC") // Prioritize pending
+        ->orderBy('created_at', 'desc')
+        ->paginate(10);
 
         return view('pages.users.index', compact('users'));
     }
@@ -145,6 +151,44 @@ class UserController extends Controller
 
         // redirect
         return redirect()->route('users.index')->with('success', 'User deleted successfully');
+    }
+
+    // approve
+    public function approve(Request $request, $id)
+    {
+        $this->isAdmin();
+        
+        $request->validate([
+            'role' => 'required|in:admin,staff,user'
+        ]);
+
+        $user = User::findOrFail($id);
+        $user->update([
+            'status_akun' => 'approved',
+            'roles'       => $request->role,
+            'approved_by' => auth()->id(),
+            'approved_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'User berhasil disetujui.');
+    }
+
+    // reject
+    public function reject(Request $request, $id)
+    {
+        $this->isAdmin();
+
+        $request->validate([
+            'rejection_reason' => 'required|string|max:500'
+        ]);
+
+        $user = User::findOrFail($id);
+        $user->update([
+            'status_akun'      => 'rejected',
+            'rejection_reason' => $request->rejection_reason,
+        ]);
+
+        return redirect()->back()->with('success', 'User ditolak.');
     }
 
     // edit profile (khusus untuk user login saat ini)
