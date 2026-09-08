@@ -152,31 +152,33 @@
                                                                     </button>
                                                                 @endif
 
-                                                                <a href="{{ route('users.edit', $user->id) }}"
-                                                                    class="btn btn-sm btn-info btn-icon mr-1"
-                                                                    data-toggle="tooltip" title="Edit User">
-                                                                    <i class="fas fa-edit"></i>
-                                                                </a>
+                                                                @if($user->status_akun != 'pending_approval')
+                                                                    <a href="{{ route('users.edit', $user->id) }}"
+                                                                        class="btn btn-sm btn-info btn-icon mr-1"
+                                                                        data-toggle="tooltip" title="Edit User">
+                                                                        <i class="fas fa-edit"></i>
+                                                                    </a>
 
-                                                                @if (auth()->id() == $user->id)
-                                                                    <button
-                                                                        class="btn btn-sm btn-danger btn-icon ml-1"
-                                                                        disabled title="Tidak bisa hapus akun sendiri"
-                                                                        data-toggle="tooltip">
-                                                                        <i class="fas fa-trash-alt"></i>
-                                                                    </button>
-                                                                @else
-                                                                    <form
-                                                                        action="{{ route('users.destroy', $user->id) }}"
-                                                                        method="POST" class="ml-1">
-                                                                        @csrf
-                                                                        @method('DELETE')
+                                                                    @if (auth()->id() == $user->id)
                                                                         <button
-                                                                            class="btn btn-sm btn-danger btn-icon btn-delete"
-                                                                            data-toggle="tooltip" title="Hapus User">
+                                                                            class="btn btn-sm btn-danger btn-icon ml-1"
+                                                                            disabled title="Tidak bisa hapus akun sendiri"
+                                                                            data-toggle="tooltip">
                                                                             <i class="fas fa-trash-alt"></i>
                                                                         </button>
-                                                                    </form>
+                                                                    @else
+                                                                        <form
+                                                                            action="{{ route('users.destroy', $user->id) }}"
+                                                                            method="POST" class="ml-1">
+                                                                            @csrf
+                                                                            @method('DELETE')
+                                                                            <button
+                                                                                class="btn btn-sm btn-danger btn-icon btn-delete"
+                                                                                data-toggle="tooltip" title="Hapus User">
+                                                                                <i class="fas fa-trash-alt"></i>
+                                                                            </button>
+                                                                        </form>
+                                                                    @endif
                                                                 @endif
                                                             </div>
                                                         @else
