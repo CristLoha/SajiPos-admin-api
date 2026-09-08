@@ -74,6 +74,37 @@ class AuthController extends Controller
     }
 
     /**
+     * Real-time email validation for Frontend (Flutter).
+     * POST /api/check-email
+     */
+    public function checkEmail(Request $request)
+    {
+        try {
+            $request->validate([
+                'email' => 'required|email:rfc,dns'
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'is_valid' => false,
+                'message' => 'Format email tidak valid atau domain tidak ditemukan.'
+            ], 200);
+        }
+
+        $exists = User::where('email', $request->email)->exists();
+        
+        if ($exists) {
+            return response()->json([
+                'is_valid' => false,
+                'message' => 'Email sudah terdaftar.'
+            ], 200);
+        }
+
+        return response()->json([
+            'is_valid' => true,
+            'message' => 'Email bisa digunakan.'
+        ], 200);
+    }
+    /**
      * Verify Email with OTP
      * POST /api/verify-email
      */
