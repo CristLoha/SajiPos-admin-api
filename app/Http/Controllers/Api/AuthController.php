@@ -23,6 +23,8 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
+        $otpCode = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+
         $user = User::create([
             'name' => $validated['nama_lengkap'],
             'email' => $validated['email'],
@@ -30,18 +32,99 @@ class AuthController extends Controller
             'password' => Hash::make($validated['password']),
             'roles' => null, // role ditentukan admin saat approve
             'status_akun' => 'pending_approval',
+            'otp_code' => $otpCode,
+            'otp_expires_at' => now()->addMinutes(10),
+        ]);
+
+        try {
+            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\OtpMail($user, $otpCode));
+        } catch (\Exception $e) {
+            // Jika gagal kirim email, biarkan pendaftaran sukses, user bisa minta resend OTP nanti
+            \Illuminate\Support\Facades\Log::error('Gagal kirim email OTP: ' . $e->getMessage());
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pendaftaran berhasil. Silakan cek email Anda untuk kode OTP verifikasi.',
+            'user' => [
+                'id' => $user->id,
+                'email' => $user->email,
+            ]
+        ], 201);
+    }
+
+    /**
+     * Verify Email with OTP
+     * POST /api/verify-email
+     */
+    public function verifyEmail(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'otp_code' => 'required|string|size:6',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'User tidak ditemukan.'], 404);
+        }
+
+        if ($user->email_verified_at) {
+            return response()->json(['success' => false, 'message' => 'Email sudah diverifikasi.'], 400);
+        }
+
+        if ($user->otp_code !== $request->otp_code) {
+            return response()->json(['success' => false, 'message' => 'Kode OTP salah.'], 400);
+        }
+
+        if (now()->greaterThan($user->otp_expires_at)) {
+            return response()->json(['success' => false, 'message' => 'Kode OTP sudah kadaluarsa.'], 400);
+        }
+
+        // Verifikasi berhasil
+        $user->update([
+            'email_verified_at' => now(),
+            'otp_code' => null,
+            'otp_expires_at' => null,
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Pendaftaran berhasil, menunggu persetujuan admin.',
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'status_akun' => $user->status_akun,
-            ]
-        ], 201);
+            'message' => 'Email berhasil diverifikasi! Menunggu persetujuan admin sebelum bisa login.'
+        ], 200);
+    }
+
+    /**
+     * Resend OTP
+     * POST /api/resend-otp
+     */
+    public function resendOtp(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'User tidak ditemukan.'], 404);
+        }
+
+        if ($user->email_verified_at) {
+            return response()->json(['success' => false, 'message' => 'Email sudah diverifikasi.'], 400);
+        }
+
+        $otpCode = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+        $user->update([
+            'otp_code' => $otpCode,
+            'otp_expires_at' => now()->addMinutes(10),
+        ]);
+
+        try {
+            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\OtpMail($user, $otpCode));
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Gagal mengirim ulang email OTP.'], 500);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Kode OTP baru telah dikirim ke email.'], 200);
     }
 
     /**
