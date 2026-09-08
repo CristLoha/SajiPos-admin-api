@@ -21,9 +21,7 @@
                 <a class="nav-link" href="{{ route('users.index') }}">
                     <i class="fas fa-users"></i>
                     <span>Users</span>
-                    @if($pendingUsers > 0)
-                        <span class="badge badge-warning ml-auto">{{ $pendingUsers }}</span>
-                    @endif
+                    <span id="sidebar-pending-badge" class="badge badge-warning ml-auto" style="display: {{ $pendingUsers > 0 ? 'inline-block' : 'none' }}">{{ $pendingUsers }}</span>
                 </a>
             </li>
             @endif
