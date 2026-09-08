@@ -1,8 +1,6 @@
 <div class="login-brand">
     <div style="margin-bottom: 8px;">
-        <div style="width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg, var(--sp-primary, #3949AB), var(--sp-primary-dark, #283593)); display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(57, 73, 171, 0.3);">
-            <i class="fas fa-utensils" style="font-size: 24px; color: #fff;"></i>
-        </div>
+        <img src="{{ asset('img/sajipos-logo.jpg') }}" alt="SajiPOS Logo" style="width: 80px; height: 80px; border-radius: 16px; object-fit: cover; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);">
     </div>
     <div style="font-size: 1.75rem; font-weight: 800; color: #1e293b; letter-spacing: -0.5px; font-family: 'Inter', sans-serif;">
         SajiPOS
