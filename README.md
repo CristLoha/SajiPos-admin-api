@@ -8,6 +8,7 @@
   <img src="https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel">
   <img src="https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP">
   <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL">
+  <img src="https://img.shields.io/badge/Firebase_FCM-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" alt="Firebase FCM">
   <img src="https://img.shields.io/badge/Flutter_API-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter API">
   <img src="https://img.shields.io/badge/Status-Active_Development-brightgreen?style=for-the-badge" alt="Status">
 </p>
@@ -37,12 +38,16 @@
 - Pembuatan *Invoice* otomatis dari pesanan pelanggan.
 - **Xendit Webhook (`/api/xendit/webhook`):** Sinkronisasi status pembayaran secara real-time dari server Xendit ke sistem SajiPOS tanpa perlu dicek manual.
 
-### 📦 4. Manajemen Master Data & Order
+### 📣 4. Integrasi Push Notification (Firebase FCM)
+- **Promo Broadcast:** Sistem akan mengirimkan *Push Notification* secara massal ke semua device kasir/pelanggan (melalui langganan topik `promo_broadcast`) setiap kali Admin membuat Campaign promo baru.
+- **Payload Dinamis:** Notifikasi membawa data *payload* khusus yang memungkinkan aplikasi mobile untuk langsung mengarahkan user ke halaman detail promo (*Deep Linking*).
+
+### 📦 5. Manajemen Master Data & Order
 - **Produk & Kategori:** CRUD lengkap melalui panel admin, serta API terpisah untuk ditampilkan di kasir.
 - **Diskon & Campaign:** Sistem voucher, potongan harga, dan campaign promosi aktif.
 - **Kalkulasi Pesanan:** Endpoint pintar untuk menghitung Subtotal, Pajak, Diskon, dan Total Harga sebelum checkout.
 
-### 📊 5. Analitik & Laporan
+### 📊 6. Analitik & Laporan
 - **Menu Terlaris:** Menampilkan produk paling laku (Harian / Sepanjang Waktu) melalui API.
 - **Laporan Transaksi:** Laporan penjualan lengkap berdasarkan filter waktu.
 
@@ -54,6 +59,7 @@
 - **Database:** MySQL
 - **Template Admin:** [Stisla](https://getstisla.com/)
 - **Mailing:** Custom SMTP (Gmail / Mailtrap)
+- **Push Notification:** Firebase Cloud Messaging (FCM)
 - **Payment Gateway:** Xendit PHP SDK
 
 ---
