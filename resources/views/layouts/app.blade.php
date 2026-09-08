@@ -135,8 +135,8 @@
                         .catch(err => console.error("Global polling error:", err));
                 }
 
-                // Run polling every 5 seconds biar INSTANT (tapi jangan buka banyak tab Admin ya!)
-                setInterval(pollGlobalStatus, 5000);
+                // Run polling every 10 seconds (Jalan tengah biar server murah gak pingsan)
+                setInterval(pollGlobalStatus, 10000);
                 // Run once on load to init
                 pollGlobalStatus();
             });
