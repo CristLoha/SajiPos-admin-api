@@ -164,7 +164,8 @@ Meminta sistem membuat kode OTP baru dan mengirimkan ulang ke email jika tidak m
 
 ### F. POST Login Kasir
 
-Melakukan login dengan menggunakan email atau username, mengembalikan token Sanctum untuk otentikasi API selanjutnya. Harus sudah di-Approve oleh Admin.
+Melakukan login dengan menggunakan email atau username.
+**PENTING (Device Binding):** Disarankan mengirimkan `device_id` (IMEI/UUID) untuk mengunci akun pada satu perangkat fisik. Jika akun diakses dari perangkat lain, sistem akan menolak (403).
 
 -   **URL:** `/login`
 -   **Method:** `POST`
@@ -174,7 +175,8 @@ Melakukan login dengan menggunakan email atau username, mengembalikan token Sanc
 ```json
 {
     "username": "budi842",
-    "password": "BudiPos193"
+    "password": "BudiPos193",
+    "device_id": "ANDROID-987654321ABC"
 }
 ```
 

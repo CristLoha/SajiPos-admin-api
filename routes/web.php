@@ -24,6 +24,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('users', UserController::class)->middleware('role:admin');
     Route::post('users/{id}/approve', [UserController::class, 'approve'])->name('users.approve')->middleware('role:admin');
     Route::post('users/{id}/reject', [UserController::class, 'reject'])->name('users.reject')->middleware('role:admin');
+    Route::post('users/{id}/reset-device', [UserController::class, 'resetDevice'])->name('users.resetDevice')->middleware('role:admin');
 
     // Profile — semua yang login boleh akses
     Route::get('/profile', [\App\Http\Controllers\UserController::class, 'editProfile'])->name('profile.edit')->middleware('role:admin,staff,user');

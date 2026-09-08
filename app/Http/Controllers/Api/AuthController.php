@@ -260,6 +260,26 @@ class AuthController extends Controller
             ], 403);
         }
 
+        // ==========================================
+        // FITUR DEVICE BINDING (Kunci Perangkat)
+        // ==========================================
+        if ($request->has('device_id') && !empty($request->device_id)) {
+            $incomingDeviceId = $request->device_id;
+            
+            // Jika device_id di database masih kosong, KUNCI akun ini ke device_id tersebut
+            if (empty($user->device_id)) {
+                $user->update(['device_id' => $incomingDeviceId]);
+            } 
+            // Jika device_id di database sudah ada, CEK apakah cocok
+            else if ($user->device_id !== $incomingDeviceId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Akses Ditolak: Akun ini sudah tertaut dengan perangkat lain. Hubungi Admin jika Anda mengganti perangkat.'
+                ], 403);
+            }
+        }
+        // ==========================================
+
         if ($user->status_akun === 'nonaktif') {
             return response()->json([
                 'success' => false,

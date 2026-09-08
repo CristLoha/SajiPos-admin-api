@@ -231,4 +231,12 @@ class UserController extends Controller
 
         return redirect()->route('home')->with('success', 'Profil Anda berhasil diperbarui!');
     }
+
+    public function resetDevice($id)
+    {
+        $this->isAdmin();
+        $user = User::findOrFail($id);
+        $user->update(['device_id' => null]);
+        return redirect()->back()->with('success', 'Device ID berhasil direset. User dapat login di perangkat baru.');
+    }
 }
