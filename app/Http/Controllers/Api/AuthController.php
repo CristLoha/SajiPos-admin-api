@@ -123,12 +123,12 @@ class AuthController extends Controller
             ], 200);
         }
 
-        $exists = User::where('email', $request->email)->exists();
+        $existingUser = User::where('email', $request->email)->first();
         
-        if ($exists) {
+        if ($existingUser && $existingUser->email_verified_at !== null) {
             return response()->json([
                 'is_valid' => false,
-                'message' => 'Email sudah terdaftar.'
+                'message' => 'Email sudah terdaftar dan terverifikasi.'
             ], 200);
         }
 
