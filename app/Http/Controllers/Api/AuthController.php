@@ -37,27 +37,29 @@ class AuthController extends Controller
 
         $otpCode = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
 
-        $user = User::create([
-            'name' => $validated['nama_lengkap'],
-            'email' => $validated['email'],
-            'username' => $validated['username'],
-            'password' => Hash::make($validated['password']),
-            'roles' => 'user', // default role adalah kasir
-            'status_akun' => 'pending_approval',
-            'otp_code' => $otpCode,
-            'otp_expires_at' => now()->addMinutes(10),
-        ]);
-
         try {
-            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\OtpMail($user, $otpCode));
-        } catch (\Exception $e) {
-            // Jika gagal kirim email (misal: email tidak eksis/bounce), HAPUS user yang terlanjur dibuat
-            $user->delete();
-            \Illuminate\Support\Facades\Log::error('Gagal kirim email OTP (User Rollback): ' . $e->getMessage());
+            $user = \Illuminate\Support\Facades\DB::transaction(function () use ($validated, $otpCode) {
+                $newUser = User::create([
+                    'name' => $validated['nama_lengkap'],
+                    'email' => $validated['email'],
+                    'username' => $validated['username'],
+                    'password' => Hash::make($validated['password']),
+                    'roles' => 'user', // default role adalah kasir
+                    'status_akun' => 'pending_approval',
+                    'otp_code' => $otpCode,
+                    'otp_expires_at' => now()->addMinutes(10),
+                ]);
+
+                \Illuminate\Support\Facades\Mail::to($newUser->email)->send(new \App\Mail\OtpMail($newUser, $otpCode));
+
+                return $newUser;
+            });
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Gagal kirim email OTP (Transaction Rollback): ' . $e->getMessage());
             
             return response()->json([
                 'success' => false,
-                'message' => 'Email tidak terdaftar atau tidak dapat menerima pesan. Silakan gunakan email aktif yang valid.'
+                'message' => 'Email tidak valid, tidak terdaftar, atau server gagal mengirim pesan. Silakan pastikan alamat email benar-benar aktif.'
             ], 422);
         }
 
@@ -138,7 +140,7 @@ class AuthController extends Controller
 
         try {
             \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\OtpMail($user, $otpCode));
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Gagal resend email OTP: ' . $e->getMessage());
             return response()->json([
                 'success' => false, 
