@@ -18,10 +18,14 @@ class UserController extends Controller
     // polling status email (lightweight)
     public function polling()
     {
-        // Hanya ambil data id dari user yang masih pending DAN SUDAH VERIFIKASI EMAIL
-        $users = User::where('status_akun', 'pending_approval')
-            ->whereNotNull('email_verified_at')
-            ->get(['id', 'email_verified_at']);
+        // Gunakan cache selama 5 detik biar kalau ada 100 tab admin yg kebuka,
+        // database MySQL cuma dipanggil 1x per 5 detik. Sisanya diambil cepat dari RAM.
+        // Ini jalan ninja buat nyelamatin CPU dan Database di shared hosting!
+        $users = \Illuminate\Support\Facades\Cache::remember('polling_pending_users', 5, function () {
+            return User::where('status_akun', 'pending_approval')
+                ->whereNotNull('email_verified_at')
+                ->get(['id', 'email_verified_at']);
+        });
             
         return response()->json(['users' => $users]);
     }
@@ -181,6 +185,8 @@ class UserController extends Controller
             'approved_at' => now(),
         ]);
 
+        \Illuminate\Support\Facades\Cache::forget('polling_pending_users');
+
         return redirect()->back()->with('success', 'User berhasil disetujui.');
     }
 
@@ -198,6 +204,8 @@ class UserController extends Controller
             'status_akun'      => 'rejected',
             'rejection_reason' => $request->rejection_reason,
         ]);
+
+        \Illuminate\Support\Facades\Cache::forget('polling_pending_users');
 
         return redirect()->back()->with('success', 'User ditolak.');
     }

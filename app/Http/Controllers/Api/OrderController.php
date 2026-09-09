@@ -312,10 +312,12 @@ class OrderController extends Controller
     {
         $query = Order::with('items.product', 'cashier')->orderBy('created_at', 'desc');
 
+        $user = $request->user();
+
         // Filter by cashier/user
-        if (auth()->check() && auth()->user()->roles === 'user') {
+        if ($user && $user->roles === 'user') {
             // Kasir (user) hanya boleh melihat riwayat transaksinya sendiri
-            $query->where('cashier_id', auth()->id());
+            $query->where('cashier_id', $user->id);
         } elseif ($request->has('cashier_id')) {
             // Admin / Staff bebas memfilter riwayat berdasarkan kasir tertentu
             $query->where('cashier_id', $request->cashier_id);

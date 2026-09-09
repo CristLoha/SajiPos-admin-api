@@ -42,9 +42,11 @@ class UserController extends Controller
         $user->update([
             'status_akun' => 'approved',
             'roles'       => $request->role,
-            'approved_by' => auth()->id() ?? 1, // Fallback if no auth context
+            'approved_by' => $request->user()?->id ?? 1, // Fallback if no auth context
             'approved_at' => now(),
         ]);
+
+        \Illuminate\Support\Facades\Cache::forget('polling_pending_users');
 
         return response()->json([
             'success' => true,
@@ -68,6 +70,8 @@ class UserController extends Controller
             'status_akun'      => 'rejected',
             'rejection_reason' => $request->rejection_reason,
         ]);
+
+        \Illuminate\Support\Facades\Cache::forget('polling_pending_users');
 
         return response()->json([
             'success' => true,

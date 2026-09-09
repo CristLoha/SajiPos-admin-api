@@ -19,9 +19,17 @@ class ReportController extends Controller
         $startDate = $request->start_date ? Carbon::parse($request->start_date)->startOfDay() : Carbon::now()->subDays(30)->startOfDay();
         $endDate = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : Carbon::now()->endOfDay();
 
+        $user = auth()->user();
+
+        // Base Query untuk Order (difilter by role)
+        $orderQuery = Order::whereBetween('transaction_time', [$startDate, $endDate]);
+        if ($user->roles === 'user') {
+            $orderQuery->where('cashier_id', $user->id);
+        }
+
         // 1. Rekap Ringkas Keuangan
-        $summary = Order::whereBetween('transaction_time', [$startDate, $endDate])
-            ->selectRaw('
+        $summary = clone $orderQuery;
+        $summary = $summary->selectRaw('
                 COUNT(id) as total_transactions,
                 SUM(sub_total) as total_sub_total,
                 SUM(discount_amount) as total_discounts,
@@ -32,16 +40,19 @@ class ReportController extends Controller
             ')->first();
 
         // 2. Statistik Metode Pembayaran
-        $paymentMethods = Order::whereBetween('transaction_time', [$startDate, $endDate])
-            ->select('payment_method', DB::raw('COUNT(id) as count'), DB::raw('SUM(total) as revenue'))
+        $paymentMethods = clone $orderQuery;
+        $paymentMethods = $paymentMethods->select('payment_method', DB::raw('COUNT(id) as count'), DB::raw('SUM(total) as revenue'))
             ->groupBy('payment_method')
             ->get();
 
         // 3. Rekap Menu Terlaris (Top 5)
         $topProducts = OrderItem::with('product.category')
             ->select('product_id', DB::raw('SUM(quantity) as qty_sold'), DB::raw('SUM(quantity * price) as revenue'))
-            ->whereHas('order', function($query) use ($startDate, $endDate) {
+            ->whereHas('order', function($query) use ($startDate, $endDate, $user) {
                 $query->whereBetween('transaction_time', [$startDate, $endDate]);
+                if ($user->roles === 'user') {
+                    $query->where('cashier_id', $user->id);
+                }
             })
             ->groupBy('product_id')
             ->orderBy('qty_sold', 'desc')
@@ -49,8 +60,8 @@ class ReportController extends Controller
             ->get();
 
         // 4. Data Harian untuk Chart (Range Pilihan)
-        $chartRaw = Order::whereBetween('transaction_time', [$startDate, $endDate])
-            ->select(
+        $chartRaw = clone $orderQuery;
+        $chartRaw = $chartRaw->select(
                 DB::raw('DATE(transaction_time) as date'),
                 DB::raw('SUM(total) as revenue'),
                 DB::raw('COUNT(id) as transactions')
@@ -83,8 +94,12 @@ class ReportController extends Controller
         $heatmapStartDate = Carbon::now()->subDays(89)->startOfDay();
         $heatmapEndDate = Carbon::now()->endOfDay();
         
-        $heatmapRaw = Order::whereBetween('transaction_time', [$heatmapStartDate, $heatmapEndDate])
-            ->select(DB::raw('DATE(transaction_time) as date'), DB::raw('COUNT(id) as count'))
+        $heatmapQuery = Order::whereBetween('transaction_time', [$heatmapStartDate, $heatmapEndDate]);
+        if ($user->roles === 'user') {
+            $heatmapQuery->where('cashier_id', $user->id);
+        }
+
+        $heatmapRaw = $heatmapQuery->select(DB::raw('DATE(transaction_time) as date'), DB::raw('COUNT(id) as count'))
             ->groupBy('date')
             ->pluck('count', 'date')
             ->toArray();

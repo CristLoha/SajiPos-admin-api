@@ -174,6 +174,8 @@ class AuthController extends Controller
             'otp_expires_at' => null,
         ]);
 
+        \Illuminate\Support\Facades\Cache::forget('polling_pending_users');
+
         return response()->json([
             'success' => true,
             'message' => 'Email berhasil diverifikasi! Menunggu persetujuan admin sebelum bisa login.'

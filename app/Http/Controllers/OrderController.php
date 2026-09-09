@@ -16,6 +16,9 @@ class OrderController extends Controller
             ->when($request->date, function ($query) use ($request) {
                 $query->whereDate('transaction_time', $request->date);
             })
+            ->when(auth()->user()->roles === 'user', function ($query) {
+                $query->where('cashier_id', auth()->id());
+            })
             ->orderBy('transaction_time', 'desc')
             ->paginate(10);
 
@@ -28,6 +31,11 @@ class OrderController extends Controller
     public function show($id)
     {
         $order = Order::with(['cashier', 'items.product'])->findOrFail($id);
+
+        if (auth()->user()->roles === 'user' && $order->cashier_id !== auth()->id()) {
+            abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
+        }
+
         return view('pages.orders.show', compact('order'));
     }
     /**

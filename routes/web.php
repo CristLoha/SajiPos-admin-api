@@ -57,8 +57,8 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('orders/bulk-delete', [\App\Http\Controllers\OrderController::class, 'bulkDelete'])->name('orders.bulkDelete');
     });
 
-    // Orders (Read-only untuk staff, destroy untuk admin)
-    Route::resource('orders', \App\Http\Controllers\OrderController::class)->only(['index', 'show'])->middleware('role:admin,staff');
+    // Orders (Read-only untuk staff dan user, destroy untuk admin)
+    Route::resource('orders', \App\Http\Controllers\OrderController::class)->only(['index', 'show'])->middleware('role:admin,staff,user');
     Route::resource('orders', \App\Http\Controllers\OrderController::class)->only(['destroy'])->middleware('role:admin');
 
     // Reports
