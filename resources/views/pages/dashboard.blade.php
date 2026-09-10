@@ -369,7 +369,13 @@
                                         </td>
                                         <td>Rp {{ number_format($order->total, 0, ',', '.') }}</td>
                                         <td>
-                                            <span class="sp-badge sp-badge-success">Selesai</span>
+                                            @if (strtolower($order->status) == 'success')
+                                                <span class="sp-badge sp-badge-success">Sukses</span>
+                                            @elseif (strtolower($order->status) == 'pending')
+                                                <span class="sp-badge sp-badge-warning">Tertunda</span>
+                                            @else
+                                                <span class="sp-badge sp-badge-danger">Batal</span>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty
