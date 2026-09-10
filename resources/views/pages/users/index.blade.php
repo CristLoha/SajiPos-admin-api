@@ -111,6 +111,9 @@
                                                     <td>
                                                         <code>{{ $user->username }}</code><br>
                                                         <small class="text-muted">{{ $user->email }}</small>
+                                                        @if($user->device_id)
+                                                            <br><small class="text-info" title="{{ $user->device_id }}"><i class="fas fa-mobile-alt"></i> {{ \Illuminate\Support\Str::limit($user->device_id, 15) }}</small>
+                                                        @endif
                                                     </td>
                                                     <td class="text-center" id="email-cell-{{ $user->id }}">
                                                         @if($user->email_verified_at)
