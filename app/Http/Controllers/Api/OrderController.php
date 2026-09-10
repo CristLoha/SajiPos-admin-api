@@ -182,8 +182,16 @@ class OrderController extends Controller
                 // Opsional: Kurangi stok produk
                 $product = \App\Models\Product::find($item['product_id']);
                 if ($product) {
+                    $oldStock = $product->stock;
                     $product->stock = max(0, $product->stock - $item['quantity']);
                     $product->save();
+
+                    // TRIGER FCM PUSH NOTIFIKASI STOCK MENIPIS / HABIS
+                    if ($oldStock > 5 && $product->stock <= 5 && $product->stock > 0) {
+                        \App\Jobs\StockLowAlertJob::dispatch($product);
+                    } else if ($oldStock > 0 && $product->stock == 0) {
+                        \App\Jobs\StockLowAlertJob::dispatch($product);
+                    }
                 }
             }
 
