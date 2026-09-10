@@ -99,5 +99,5 @@
 - **Tone:** Komunikasi user super santai (banyak ngakak "wkwkwk", panggil "bor", "jir"). Gas aja eksekusi cepat!
 
 ### 6. 🚨 Peringatan Stok & Manajemen Inventaris
-- **API Update:** Modifikasi  untuk memantau sisa stok otomatis setiap kali pesanan masuk.
+- **API Update:** Modifikasi `OrderController@store` untuk memantau sisa stok otomatis setiap kali pesanan masuk.
 - **FCM Push Notif:** Menambahkan Job baru `StockLowAlertJob` yang mengirim Push Notification ke topik `stock_alerts` ketika stok drop menjadi <= 5 (Peringatan Menipis) dan ketika stok mencapai 0 (Habis/Sold Out) agar kasir tidak panik kecolongan barang kosong.
