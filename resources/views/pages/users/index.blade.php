@@ -230,77 +230,77 @@
                     </div>
                 </div>
             </div>
+            <!-- Modals for Approve and Reject -->
+            @if(auth()->user()->roles == 'admin')
+                @foreach($users as $user)
+                    @if($user->status_akun == 'pending_approval')
+                        <!-- Approve Modal -->
+                        <div class="modal fade" id="approveModal{{ $user->id }}" tabindex="-1" role="dialog" aria-labelledby="approveModalLabel{{ $user->id }}" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <form action="{{ route('users.approve', $user->id) }}" method="POST">
+                                        @csrf
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="approveModalLabel{{ $user->id }}">Setujui User: {{ $user->name }}</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Pilih role untuk user ini:</p>
+                                            <div class="form-group">
+                                                <label>Role</label>
+                                                <select name="role" class="form-control selectric" required>
+                                                    <option value="" disabled>Pilih Role...</option>
+                                                    <option value="admin" {{ $user->roles == 'admin' ? 'selected' : '' }}>Admin</option>
+                                                    <option value="staff" {{ $user->roles == 'staff' ? 'selected' : '' }}>Staff</option>
+                                                    <option value="user" {{ $user->roles == 'user' ? 'selected' : '' }}>User (Kasir)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                            <button type="submit" class="btn btn-success">Setujui</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reject Modal -->
+                        <div class="modal fade" id="rejectModal{{ $user->id }}" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel{{ $user->id }}" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <form action="{{ route('users.reject', $user->id) }}" method="POST">
+                                        @csrf
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="rejectModalLabel{{ $user->id }}">Tolak User: {{ $user->name }}</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Berikan alasan penolakan:</p>
+                                            <div class="form-group">
+                                                <label>Alasan</label>
+                                                <textarea name="rejection_reason" class="form-control" rows="3" required></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                            <button type="submit" class="btn btn-danger">Tolak</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                @endforeach
+            @endif
+            </div> <!-- End of live-users-container -->
         </section>
     </div>
 
-    <!-- Modals for Approve and Reject -->
-    @if(auth()->user()->roles == 'admin')
-        @foreach($users as $user)
-            @if($user->status_akun == 'pending_approval')
-                <!-- Approve Modal -->
-                <div class="modal fade" id="approveModal{{ $user->id }}" tabindex="-1" role="dialog" aria-labelledby="approveModalLabel{{ $user->id }}" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <form action="{{ route('users.approve', $user->id) }}" method="POST">
-                                @csrf
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="approveModalLabel{{ $user->id }}">Setujui User: {{ $user->name }}</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <p>Pilih role untuk user ini:</p>
-                                    <div class="form-group">
-                                        <label>Role</label>
-                                        <select name="role" class="form-control selectric" required>
-                                            <option value="" disabled>Pilih Role...</option>
-                                            <option value="admin" {{ $user->roles == 'admin' ? 'selected' : '' }}>Admin</option>
-                                            <option value="staff" {{ $user->roles == 'staff' ? 'selected' : '' }}>Staff</option>
-                                            <option value="user" {{ $user->roles == 'user' ? 'selected' : '' }}>User (Kasir)</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                                    <button type="submit" class="btn btn-success">Setujui</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Reject Modal -->
-                <div class="modal fade" id="rejectModal{{ $user->id }}" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel{{ $user->id }}" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <form action="{{ route('users.reject', $user->id) }}" method="POST">
-                                @csrf
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="rejectModalLabel{{ $user->id }}">Tolak User: {{ $user->name }}</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <p>Berikan alasan penolakan:</p>
-                                    <div class="form-group">
-                                        <label>Alasan</label>
-                                        <textarea name="rejection_reason" class="form-control" rows="3" required></textarea>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                                    <button type="submit" class="btn btn-danger">Tolak</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            @endif
-        @endforeach
-    @endif
-    </div>
 @endsection
 
 @push('scripts')
