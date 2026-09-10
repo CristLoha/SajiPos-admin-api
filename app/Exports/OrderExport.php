@@ -22,7 +22,7 @@ class OrderExport implements FromView, ShouldAutoSize, WithStyles
         return view('pages.reports.export', $this->data);
     }
 
-    public function styles(Worksheet $sheet): array
+    public function styles(Worksheet $sheet): ?array
     {
         return [
             1    => ['font' => ['bold' => true]],
