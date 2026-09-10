@@ -45,6 +45,11 @@
 - **Fungsi:** Menyediakan JSON matang tanpa perlu hitung manual di Flutter. Berisi: Total Omzet, Total Transaksi, Total Pajak, Total Diskon, Rincian Pembayaran (Jumlah dan Total Uang Cash, QRIS, Transfer), Menu Terlaris (Top 3), dan Grafik Penjualan (Per Jam).
 - **Akses Role:** Memindahkan *middleware* *route* laporan dari yang tadinya eksklusif untuk Admin/Staff, menjadi bisa diakses oleh Kasir (User). Kasir hanya akan melihat omzet/laporannya sendiri.
 
+### 5. ⚡ Performa & Optimasi (Sesi Pagi/Siang)
+- **Optimasi Server Shared Hosting (Cache):** Menerapkan `Cache::remember('polling_pending_users', 5)` di `UserController@polling` untuk menghindari DB Crash (Error 508) saat banyak tab admin terbuka dan melakukan AJAX Polling secara bersamaan.
+- **Cache Invalidation:** Menambahkan `Cache::forget('polling_pending_users')` di `UserController@approve`, `UserController@reject`, dan `AuthController@verifyEmail` agar UI Admin Web tetap *realtime* tanpa perlu menunggu cache kedaluwarsa jika ada aksi.
+- **Troubleshooting Frontend:** Menemukan bahwa jika suara atau *request* terjadi secara bar-bar/realtime terus-menerus, itu disebabkan oleh implementasi *looping polling* yang terlalu cepat di sisi Frontend (Flutter atau Admin Web tab yang terbuka banyak), bukan karena ada fitur *Push Notification realtime* di backend saat pesanan masuk.
+
 ---
 
 ## 📅 Log Pembaruan: 8 September 2026 (Sesi Malam - The Final Polish)
@@ -90,10 +95,3 @@
   1. Wajib ada **Global Interceptor** untuk nge-handle HTTP 401 dan menendang user ke Halaman Login (efek Single Active Session).
   2. Saat tekan verifikasi OTP, wajib kirim `email` dan `otp_code` berbarengan.
 - **Tone:** Komunikasi user super santai (banyak ngakak "wkwkwk", panggil "bor", "jir"). Gas aja eksekusi cepat!
-
-## 📅 Log Pembaruan Terkini (Hari Ini)
-- **Optimasi Server Shared Hosting (Cache):** Menerapkan `Cache::remember('polling_pending_users', 5)` di `UserController@polling` untuk menghindari DB Crash (Error 508) saat banyak tab admin terbuka dan melakukan AJAX Polling secara bersamaan.
-- **Cache Invalidation:** Menambahkan `Cache::forget('polling_pending_users')` di `UserController@approve`, `UserController@reject`, dan `AuthController@verifyEmail` agar UI Admin Web tetap *realtime* tanpa perlu menunggu cache kedaluwarsa jika ada aksi.
-- **Testing Live API:** Melakukan stress-test dan injeksi 2 data order *dummy* via `POST /api/orders` langsung ke server production (Domcloud).
-- **Validasi Flutter Endpoint:** Membuktikan bahwa endpoint `GET /api/orders` sudah berhasil mengisolasi data kasir secara sempurna (tidak perlu parameter `cashier_id` dari Flutter, melainkan diambil langsung dari Sanctum Token).
-- **Troubleshooting Frontend:** Menemukan bahwa jika suara atau *request* terjadi secara bar-bar/realtime terus-menerus, itu disebabkan oleh implementasi *looping polling* yang terlalu cepat di sisi Frontend (Flutter atau Admin Web tab yang terbuka banyak), bukan karena ada fitur *Push Notification realtime* di backend saat pesanan masuk.
