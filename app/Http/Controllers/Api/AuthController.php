@@ -282,6 +282,9 @@ class AuthController extends Controller
             ], 403);
         }
 
+        // Record last login time
+        $user->update(['last_login_at' => now()]);
+
         // Generate Sanctum token
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -305,6 +308,9 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
+        // Record last logout time
+        $request->user()->update(['last_logout_at' => now()]);
+
         // Revoke current token
         $request->user()->currentAccessToken()->delete();
 

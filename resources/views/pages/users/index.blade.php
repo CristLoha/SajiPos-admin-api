@@ -91,7 +91,7 @@
                                                 <th class="text-center">Email</th>
                                                 <th class="text-center">Status</th>
                                                 <th class="text-center">Role</th>
-                                                <th>Dibuat</th>
+                                                <th>Aktivitas</th>
                                                 <th class="text-center" style="width: 200px;">Aksi</th>
                                             </tr>
                                         </thead>
@@ -142,7 +142,15 @@
                                                             <span class="text-muted">-</span>
                                                         @endif
                                                     </td>
-                                                    <td>{{ $user->created_at->format('d M Y') }}</td>
+                                                    <td>
+                                                        <small class="text-muted d-block">Terdaftar: {{ $user->created_at->format('d M Y') }}</small>
+                                                        @if($user->last_login_at)
+                                                            <small class="text-success d-block" title="Last Login"><i class="fas fa-sign-in-alt"></i> {{ $user->last_login_at->format('d M Y, H:i') }}</small>
+                                                        @endif
+                                                        @if($user->last_logout_at)
+                                                            <small class="text-danger d-block" title="Last Logout"><i class="fas fa-sign-out-alt"></i> {{ $user->last_logout_at->format('d M Y, H:i') }}</small>
+                                                        @endif
+                                                    </td>
                                                     <td class="text-center">
                                                         @if (auth()->user()->roles == 'admin')
                                                             <div class="d-flex justify-content-center">
