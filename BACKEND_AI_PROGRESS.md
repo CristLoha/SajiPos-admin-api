@@ -25,6 +25,28 @@
 
 ---
 
+## 📅 Log Pembaruan: 10 September 2026 (Sesi Perombakan Keamanan & Fitur Baru)
+
+### 1. 🕒 Tracking Waktu Aktivitas (Login & Logout)
+- **Database Update:** Menambahkan kolom `last_login_at` dan `last_logout_at` di tabel `users`.
+- **API Update:** Mengubah logika di `AuthController@login` dan `logout` agar selalu mencatat waktu secara *realtime* pakai fungsi `now()`.
+- **UI Web Admin:** Mengubah kolom tabel *Dashboard* dari "Dibuat" menjadi **"Aktivitas"**, yang kini menampilkan tanggal daftar, jam terakhir *Login* (hijau), dan jam terakhir *Logout* (merah).
+
+### 2. 🪲 Bug Fix UI Web Admin
+- **Modal Action Fix:** Memperbaiki bug di mana tombol *Approve/Reject* tidak bisa di-klik di tab "Semua". Masalahnya karena tag HTML penutup *modal* ketinggalan di luar `div` container AJAX Polling. Strukturnya sudah dibenahi.
+- **Dynamic Dashboard Status:** Memperbaiki bug visual di mana status pesanan di halaman utama Admin selalu menampilkan teks "Selesai" (hardcode). Sekarang sudah *dynamic* mengikuti status asli dari database (Sukses, Tertunda, Batal).
+
+### 3. 🛡️ Security Fix: Pembuatan Pesanan (Anti-Spoofing ID Kasir)
+- **API Endpoint:** `POST /api/orders` (di `OrderController@store`).
+- **Fix:** Menghapus parameter `cashier_id` dari validasi. Backend sekarang BODO AMAT dengan input JSON dari Flutter, dan secara paksa mengambil identitas kasir dari Token Bearer (`$request->user()->id`). Ini mencegah admin/kasir lain sengaja menyamar sebagai kasir lain saat transaksi.
+
+### 4. 📊 Fitur Baru: API Ringkasan Tutup Shift (Laporan Kasir)
+- **API Endpoint Baru:** Dibuatkan `GET /api/reports/summary`.
+- **Fungsi:** Menyediakan JSON matang tanpa perlu hitung manual di Flutter. Berisi: Total Omzet, Total Transaksi, Total Pajak, Total Diskon, Rincian Pembayaran (Jumlah dan Total Uang Cash, QRIS, Transfer), Menu Terlaris (Top 3), dan Grafik Penjualan (Per Jam).
+- **Akses Role:** Memindahkan *middleware* *route* laporan dari yang tadinya eksklusif untuk Admin/Staff, menjadi bisa diakses oleh Kasir (User). Kasir hanya akan melihat omzet/laporannya sendiri.
+
+---
+
 ## 📅 Log Pembaruan: 8 September 2026 (Sesi Malam - The Final Polish)
 
 ### 1. 🔐 Penyempurnaan Alur Register (Jalan Ninja) & Anti-Spam
