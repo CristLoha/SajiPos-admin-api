@@ -1,6 +1,27 @@
-# 🚀 Catatan Progres AI (SajiPOS Backend)
+# 🚀 Catatan Progres & Aturan AI (SajiPOS Backend)
 
-*Dokumen ini dibuat agar AI asisten tidak amnesia di sesi berikutnya. Berisi rangkuman seluruh fitur, perubahan struktur, dan logika bisnis yang sudah diimplementasikan ke dalam SajiPOS.*
+*Dokumen ini dibuat agar AI asisten tidak amnesia di sesi berikutnya. Berisi aturan ketat, rangkuman seluruh fitur, perubahan struktur, dan logika bisnis yang sudah diimplementasikan ke dalam SajiPOS.*
+
+---
+
+## 🤖 ATURAN WAJIB (GLOBAL RULES) UNTUK AI BACKEND
+*Peringatan: Aturan ini bersifat permanen sebagai ingatan utama (Core Memory) dan WAJIB dipatuhi oleh AI pada setiap sesi pengembangan Laravel.*
+
+1. **Efisiensi & Anti-Crash (Shared Hosting Mindset)**
+   - Sistem ini di-deploy di **Shared Hosting (Domcloud)**. Selalu pikirkan efisiensi CPU dan RAM.
+   - Jangan membuat *query* N+1. Selalu gunakan Eager Loading (`with()`).
+   - Wajib gunakan `Cache::remember` untuk query atau *polling* yang sering dipanggil (seperti notifikasi user baru) untuk mencegah Error 508 Resource Limit.
+2. **Standardisasi API Response & Error Handling**
+   - Setiap API Endpoint WAJIB me-return JSON dengan format seragam: `success` (boolean), `message` (string), dan `data` (jika ada).
+   - Jangan pernah me-return HTML Stack Trace. Gunakan format JSON untuk semua response error (401, 403, 404, 422, 500).
+   - Status 401 khusus untuk Token Invalid/Expired. Status 403 untuk akses dilarang (contoh: akun pending/ditolak).
+3. **Keamanan & Autentikasi**
+   - Pertahankan fitur **Single Active Session** (`$user->tokens()->delete()` saat login).
+   - Jangan percayai input dari Frontend. Lakukan validasi ketat di Laravel Request/Controller.
+4. **Dokumentasi Real-Time**
+   - Setiap selesai membuat endpoint baru atau merombak *database*, AI **WAJIB** memperbarui file `resources/docs/api.md` agar tim Frontend/Flutter tidak kebingungan.
+5. **Gaya Komunikasi**
+   - Gunakan gaya bahasa super santai, *to the point*, dan asik (sebut user "bor", gunakan "wkwk"). Fokus pada eksekusi cepat dan *problem solving*.
 
 ---
 
@@ -47,3 +68,10 @@
   1. Wajib ada **Global Interceptor** untuk nge-handle HTTP 401 dan menendang user ke Halaman Login (efek Single Active Session).
   2. Saat tekan verifikasi OTP, wajib kirim `email` dan `otp_code` berbarengan.
 - **Tone:** Komunikasi user super santai (banyak ngakak "wkwkwk", panggil "bor", "jir"). Gas aja eksekusi cepat!
+
+## 📅 Log Pembaruan Terkini (Hari Ini)
+- **Optimasi Server Shared Hosting (Cache):** Menerapkan `Cache::remember('polling_pending_users', 5)` di `UserController@polling` untuk menghindari DB Crash (Error 508) saat banyak tab admin terbuka dan melakukan AJAX Polling secara bersamaan.
+- **Cache Invalidation:** Menambahkan `Cache::forget('polling_pending_users')` di `UserController@approve`, `UserController@reject`, dan `AuthController@verifyEmail` agar UI Admin Web tetap *realtime* tanpa perlu menunggu cache kedaluwarsa jika ada aksi.
+- **Testing Live API:** Melakukan stress-test dan injeksi 2 data order *dummy* via `POST /api/orders` langsung ke server production (Domcloud).
+- **Validasi Flutter Endpoint:** Membuktikan bahwa endpoint `GET /api/orders` sudah berhasil mengisolasi data kasir secara sempurna (tidak perlu parameter `cashier_id` dari Flutter, melainkan diambil langsung dari Sanctum Token).
+- **Troubleshooting Frontend:** Menemukan bahwa jika suara atau *request* terjadi secara bar-bar/realtime terus-menerus, itu disebabkan oleh implementasi *looping polling* yang terlalu cepat di sisi Frontend (Flutter atau Admin Web tab yang terbuka banyak), bukan karena ada fitur *Push Notification realtime* di backend saat pesanan masuk.
