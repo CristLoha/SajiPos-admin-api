@@ -85,7 +85,8 @@
                     fetch('{{ route("users.polling") }}')
                         .then(r => r.json())
                         .then(data => {
-                            let currentUsersJson = JSON.stringify(data.users);
+                            let currentIdsList = data.users.map(u => u.id);
+                            let currentIds = currentIdsList.sort().join(',');
                             let pendingCount = data.users.length;
                             
                             // Update Badge Notifikasi di Tab Browser
@@ -102,8 +103,16 @@
                                 sidebarBadge.style.display = pendingCount > 0 ? 'inline-block' : 'none';
                             }
                             
-                            // If state changed from previous poll (ignore initial load)
-                            if (lastUsersJson !== null && lastUsersJson !== currentUsersJson) {
+                            let hasNewId = false;
+                            if (lastUsersJson !== null && lastUsersJson !== '') {
+                                let oldIdsList = lastUsersJson.split(',').map(Number);
+                                hasNewId = currentIdsList.some(id => !oldIdsList.includes(id));
+                            } else if (lastUsersJson !== null && lastUsersJson === '' && pendingCount > 0) {
+                                hasNewId = true;
+                            }
+
+                            // Hanya play notif jika ada USER BARU yang masuk (bukan saat user di-approve/berkurang)
+                            if (lastUsersJson !== null && hasNewId) {
                                 // Play sound
                                 notifSound.play().catch(e => console.log('Audio blocked:', e));
                                 
@@ -130,7 +139,7 @@
                                 }
                             }
                             
-                            lastUsersJson = currentUsersJson;
+                            lastUsersJson = currentIds;
                         })
                         .catch(err => console.error("Global polling error:", err));
                 }
