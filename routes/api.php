@@ -35,6 +35,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('orders/{id}/check-status', [\App\Http\Controllers\Api\OrderController::class, 'checkStatus']);
     Route::get('orders/{id}', [\App\Http\Controllers\Api\OrderController::class, 'show']);
     Route::delete('orders/{id}', [\App\Http\Controllers\Api\OrderController::class, 'destroy']);
+    
+    // API Routes untuk Laporan Kasir (Bisa diakses oleh Kasir & Admin)
+    Route::get('reports/summary', [\App\Http\Controllers\Api\ReportController::class, 'summary']);
 
     // API Routes untuk Kategori & Produk (Hanya baca untuk umum)
     Route::apiResource('categories', \App\Http\Controllers\Api\CategoryController::class)->only(['index', 'show'])->names([
@@ -80,11 +83,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     });
 
-    // AREA KHUSUS ADMIN & STAFF (Laporan & Pengaturan)
-    Route::middleware('role:admin,staff')->group(function () {
-        // API Routes untuk Laporan Kasir
-        Route::get('cashier/reports/transactions', [\App\Http\Controllers\Api\ReportController::class, 'transactions']);
+    // API Routes untuk Laporan Kasir (Bisa diakses oleh Kasir & Admin)
+    Route::get('reports/transactions', [\App\Http\Controllers\Api\ReportController::class, 'transactions']);
 
+    // AREA KHUSUS ADMIN & STAFF (Pengaturan)
+    Route::middleware('role:admin,staff')->group(function () {
         // API Routes untuk Pengaturan (Profil Toko & Perhitungan Biaya)
         Route::get('settings/store', [\App\Http\Controllers\SettingController::class, 'getShopProfile']);
         Route::put('settings/store', [\App\Http\Controllers\SettingController::class, 'updateShopProfile']);
