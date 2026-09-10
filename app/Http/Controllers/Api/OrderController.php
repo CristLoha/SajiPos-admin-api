@@ -78,7 +78,6 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'cashier_id' => 'required|exists:users,id',
             'transaction_time' => 'required|string',
             'sub_total' => 'required|numeric',
             'discount_id' => 'nullable|exists:discounts,id',
@@ -156,9 +155,9 @@ class OrderController extends Controller
             $calculated_total = $subtotal + $shipping_fee + $service_fee + $tax_amount;
 
             $order = Order::create([
-                'cashier_id' => $request->cashier_id,
+                'cashier_id' => $request->user()->id, // Paksa pake ID dari token, abaikan input dari frontend!
                 'transaction_time' => $request->transaction_time,
-                'sub_total' => $total_harga_item, // save the original item sub_total in DB as designed earlier
+                'sub_total' => $total_harga_item,
                 'discount_id' => $request->discount_id,
                 'discount_name' => $discount_name,
                 'discount_amount' => $final_discount_amount,
