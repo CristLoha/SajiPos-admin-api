@@ -8,8 +8,8 @@
             <div class="section-header">
                 <h1>Laporan Penjualan</h1>
                 <div class="section-header-breadcrumb">
-                    <div class="breadcrumb-item active"><a href="#">Dashboard</a></div>
-                    <div class="breadcrumb-item">Laporan</div>
+                    <a href="{{ route('reports.excel', request()->all()) }}" class="btn btn-success mr-2"><i class="fas fa-file-excel"></i> Export Excel</a>
+                    <a href="{{ route('reports.pdf', request()->all()) }}" class="btn btn-danger"><i class="fas fa-file-pdf"></i> Export PDF</a>
                 </div>
             </div>
 

@@ -139,4 +139,58 @@ class ReportController extends Controller
             'heatmapData'
         ));
     }
+
+    /**
+     * Get Report Data
+     */
+    private function getReportData(Request $request)
+    {
+        $startDate = $request->start_date ? Carbon::parse($request->start_date)->startOfDay() : Carbon::now()->subDays(30)->startOfDay();
+        $endDate = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : Carbon::now()->endOfDay();
+        $user = auth()->user();
+
+        $orderQuery = Order::with('cashier')->whereBetween('transaction_time', [$startDate, $endDate]);
+        if ($user->roles === 'user') {
+            $orderQuery->where('cashier_id', $user->id);
+        }
+
+        $summary = clone $orderQuery;
+        $summary = $summary->selectRaw('
+                COUNT(id) as total_transactions,
+                SUM(sub_total) as total_sub_total,
+                SUM(discount_amount) as total_discounts,
+                SUM(shipping_cost) as total_shipping,
+                SUM(service_charge) as total_service_charges,
+                SUM(tax) as total_taxes,
+                SUM(total) as total_revenue
+            ')->first();
+
+        $paymentMethods = clone $orderQuery;
+        $paymentMethods = $paymentMethods->select('payment_method', DB::raw('COUNT(id) as count'), DB::raw('SUM(total) as revenue'))
+            ->groupBy('payment_method')
+            ->get();
+
+        $orders = $orderQuery->orderBy('transaction_time', 'desc')->get();
+
+        return compact('startDate', 'endDate', 'summary', 'paymentMethods', 'orders');
+    }
+
+    /**
+     * Export PDF
+     */
+    public function exportPdf(Request $request)
+    {
+        $data = $this->getReportData($request);
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pages.reports.export', $data);
+        return $pdf->download('laporan-sajipos-'.$data['startDate']->format('Ymd').'-'.$data['endDate']->format('Ymd').'.pdf');
+    }
+
+    /**
+     * Export Excel
+     */
+    public function exportExcel(Request $request)
+    {
+        $data = $this->getReportData($request);
+        return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\OrderExport($data), 'laporan-sajipos-'.$data['startDate']->format('Ymd').'-'.$data['endDate']->format('Ymd').'.xlsx');
+    }
 }

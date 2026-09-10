@@ -22,6 +22,8 @@
    - Setiap selesai membuat endpoint baru atau merombak *database*, AI **WAJIB** memperbarui file `resources/docs/api.md` agar tim Frontend/Flutter tidak kebingungan.
 5. **Gaya Komunikasi**
    - Gunakan gaya bahasa super santai, *to the point*, dan asik (sebut user "bor", gunakan "wkwk"). Fokus pada eksekusi cepat dan *problem solving*.
+6. **Wajib Git Push (Auto-Deploy)**
+   - Mengingat website sudah di-hosting, setiap kali selesai implementasi satu fitur atau perbaikan bug, **WAJIB** langsung di-push ke repository biar langsung sinkron dan live di server!
 
 ---
 

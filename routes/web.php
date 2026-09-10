@@ -63,6 +63,8 @@ Route::middleware(['auth'])->group(function () {
 
     // Reports
     Route::get('/reports', [\App\Http\Controllers\ReportController::class, 'index'])->name('reports.index')->middleware('role:admin,staff,user');
+    Route::get('/reports/export/pdf', [\App\Http\Controllers\ReportController::class, 'exportPdf'])->name('reports.pdf')->middleware('role:admin,staff,user');
+    Route::get('/reports/export/excel', [\App\Http\Controllers\ReportController::class, 'exportExcel'])->name('reports.excel')->middleware('role:admin,staff,user');
     
     // Settings
     Route::get('/settings', [\App\Http\Controllers\SettingWebController::class, 'index'])->name('settings.index')->middleware('role:admin');
