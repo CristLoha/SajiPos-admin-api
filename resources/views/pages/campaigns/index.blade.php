@@ -39,18 +39,14 @@
                             </div>
                             <div class="card-body">
                                 <div class="float-right mb-3">
-                                    <form method="GET" action="{{ route('campaigns.index') }}" class="w-100">
-                                        <div class="row m-0 justify-content-end">
-                                            <div class="col-md-5 pr-0 mb-2">
-                                                <div class="input-group">
-                                                    <input type="text" class="form-control" placeholder="Cari nama campaign..." name="name" value="{{ request('name') }}">
-                                                    <div class="input-group-append">
-                                                        <button class="btn btn-primary"><i class="fas fa-search"></i></button>
-                                                        @if(request('name'))
-                                                            <a href="{{ route('campaigns.index') }}" class="btn btn-secondary"><i class="fas fa-sync"></i></a>
-                                                        @endif
-                                                    </div>
-                                                </div>
+                                    <form method="GET" action="{{ route('campaigns.index') }}">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" placeholder="Cari nama campaign..." name="name" value="{{ request('name') }}" style="min-width: 300px;">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-primary"><i class="fas fa-search"></i> Cari</button>
+                                                @if(request('name'))
+                                                    <a href="{{ route('campaigns.index') }}" class="btn btn-danger" data-toggle="tooltip" title="Reset"><i class="fas fa-times"></i></a>
+                                                @endif
                                             </div>
                                         </div>
                                     </form>
