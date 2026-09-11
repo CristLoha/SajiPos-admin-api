@@ -122,3 +122,6 @@
 - **UI Tweaks:** Menghapus info ID Perangkat teknis dari tabel Users, dan memindahkannya ke dropdown opsi 'Reset Device' di halaman Pengaturan.
 
 - **UI Keamanan:** Memperbaiki logika UI (`@if`) di halaman Kategori, Diskon, dan Campaign. Kasir (User/Staff) sekarang benar-benar tidak bisa melihat tombol Tambah, Edit, atau Hapus (Sebelumnya tombol tetap muncul walaupun aksi di-*block* oleh backend).
+
+
+- **Fitur Baru (Keamanan):** Mengaktifkan Single Active Session untuk Web Dashboard. Jika admin login di perangkat baru, sesi di perangkat lama akan otomatis ter-logout menggunakan `AuthenticateSession` dan `Auth::logoutOtherDevices`.
