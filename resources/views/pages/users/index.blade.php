@@ -301,9 +301,12 @@
     <!-- Page Specific JS File -->
     <script src="{{ asset('js/page/features-posts.js') }}"></script>
 
-    <!-- Konfirmasi Delete -->
+    <!-- Konfirmasi Delete & Modal Fix -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Fix modal z-index issue (Stisla backdrop bug)
+            $('.modal').appendTo('body');
+
             const deleteButtons = document.querySelectorAll('.btn-delete');
             deleteButtons.forEach(function(button) {
                 button.addEventListener('click', function(e) {

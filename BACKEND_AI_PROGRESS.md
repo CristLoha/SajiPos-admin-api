@@ -131,3 +131,5 @@
 - **Fitur Baru (Katalog Sinkronisasi Otomatis):** Menambahkan `CatalogUpdateAlertJob` yang mengirim FCM ke topik `catalog_updates` setiap kali Admin menambah, mengubah, atau menghapus Produk/Kategori. Dokumentasi FCM juga sudah diupdate.
 
 - **Perbaikan Bug (Login):** Menyesuaikan pesan error di Web Dashboard (Fortify) agar menampilkan status 'Akun menunggu persetujuan' jika akun belum di-approve, bukan 'Username/Password salah'.
+
+- **Perbaikan UI (Modal):** Mengatasi *bug* layar hitam (z-index backdrop) saat membuka Modal Setujui/Tolak User di halaman Kasir dengan memindahkan elemen modal ke `body` via JavaScript.
