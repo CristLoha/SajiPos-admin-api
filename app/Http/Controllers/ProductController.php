@@ -92,6 +92,8 @@ class ProductController extends Controller
 
         Product::create($data);
 
+        \App\Jobs\CatalogUpdateAlertJob::dispatch('Katalog Diperbarui', 'Ada produk baru ditambahkan!', 'product');
+
         return redirect()->route('products.index')->with('success', 'Produk berhasil ditambahkan!');
     }
 
@@ -164,6 +166,8 @@ class ProductController extends Controller
 
         $product->save();
 
+        \App\Jobs\CatalogUpdateAlertJob::dispatch('Katalog Diperbarui', 'Produk ' . $product->name . ' telah diperbarui!', 'product');
+
         return redirect()->route('products.index')->with('success', 'Produk berhasil diperbarui!');
     }
 
@@ -180,7 +184,10 @@ class ProductController extends Controller
             Storage::disk('public')->delete($product->image);
         }
 
+        $name = $product->name;
         $product->delete();
+
+        \App\Jobs\CatalogUpdateAlertJob::dispatch('Katalog Diperbarui', 'Produk ' . $name . ' telah dihapus!', 'product');
 
         return redirect()->route('products.index')->with('success', 'Produk berhasil dihapus!');
     }

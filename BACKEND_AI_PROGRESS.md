@@ -127,3 +127,5 @@
 - **Fitur Baru (Keamanan):** Mengaktifkan Single Active Session untuk Web Dashboard. Jika admin login di perangkat baru, sesi di perangkat lama akan otomatis ter-logout menggunakan `AuthenticateSession` dan `Auth::logoutOtherDevices`.
 
 - **Dokumentasi API:** Memperbarui `resources/docs/api.md` dengan menambahkan dokumentasi fitur *Peringatan Stok & Manajemen Inventaris* (termasuk instruksi subscribe FCM Topic `stock_alerts` dan payload JSON-nya) untuk tim Frontend Flutter.
+
+- **Fitur Baru (Katalog Sinkronisasi Otomatis):** Menambahkan `CatalogUpdateAlertJob` yang mengirim FCM ke topik `catalog_updates` setiap kali Admin menambah, mengubah, atau menghapus Produk/Kategori. Dokumentasi FCM juga sudah diupdate.

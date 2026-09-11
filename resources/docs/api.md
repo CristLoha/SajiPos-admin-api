@@ -1172,3 +1172,27 @@ Notifikasi yang dikirim akan berisi detail produk agar Frontend dapat memperbaru
     "action": "alert_stock"
 }
 ```
+
+---
+
+## 12. 🔄 Peringatan Sinkronisasi Katalog (Menu / Produk)
+
+Backend SajiPOS otomatis mengirimkan sinyal (*Push Notification*) ke seluruh aplikasi Kasir setiap kali ada perubahan pada data katalog (Produk atau Kategori baru, diperbarui, atau dihapus) oleh Admin di Web Dashboard. Hal ini memastikan kasir selalu mendapatkan data terbaru tanpa harus sering melakukan pull-to-refresh secara manual.
+
+### 📱 Menerima Sinyal Sinkronisasi (Untuk Aplikasi Kasir)
+
+Aplikasi Kasir **wajib melakukan subscribe** ke topik FCM berikut saat Kasir berhasil _login_:
+
+-   **Nama Topic:** `catalog_updates`
+
+_(Contoh kode pada Flutter: `await FirebaseMessaging.instance.subscribeToTopic("catalog_updates");`)_
+
+#### 📦 Struktur Data Payload (Data Tersembunyi)
+Notifikasi yang dikirim berisi informasi bahwa terjadi pembaruan data. Frontend dapat menampilkan Notifikasi/Toast seperti *"Katalog Diperbarui: Ada produk baru ditambahkan!"* dan menyediakan tombol untuk melakukan Refresh (memanggil ulang API `GET /api/products` dan `GET /api/categories`).
+
+```json
+{
+    "action": "catalog_sync_required",
+    "type": "product" // atau "category"
+}
+```

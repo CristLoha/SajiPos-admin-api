@@ -53,6 +53,7 @@ class CategoryController extends Controller
 
         Category::create($data);
 
+        \App\Jobs\CatalogUpdateAlertJob::dispatch('Katalog Diperbarui', 'Ada kategori baru ditambahkan!', 'category');
         return redirect()->route('categories.index')->with('success', 'Kategori berhasil ditambahkan!');
     }
 
@@ -94,6 +95,7 @@ class CategoryController extends Controller
 
         $category->save();
 
+        \App\Jobs\CatalogUpdateAlertJob::dispatch('Katalog Diperbarui', 'Kategori ' . $category->name . ' telah diperbarui!', 'category');
         return redirect()->route('categories.index')->with('success', 'Kategori berhasil diperbarui!');
     }
 
@@ -104,8 +106,11 @@ class CategoryController extends Controller
     {
         $this->isAdmin();
         $category = Category::findOrFail($id);
+        $name = $category->name;
 
         $category->delete();
+
+        \App\Jobs\CatalogUpdateAlertJob::dispatch('Katalog Diperbarui', 'Kategori ' . $name . ' telah dihapus!', 'category');
 
         return redirect()->route('categories.index')->with('success', 'Kategori berhasil dihapus!');
     }
