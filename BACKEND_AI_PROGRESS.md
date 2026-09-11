@@ -101,3 +101,8 @@
 ### 6. 🚨 Peringatan Stok & Manajemen Inventaris
 - **API Update:** Modifikasi `OrderController@store` untuk memantau sisa stok otomatis setiap kali pesanan masuk.
 - **FCM Push Notif:** Menambahkan Job baru `StockLowAlertJob` yang mengirim Push Notification ke topik `stock_alerts` ketika stok drop menjadi <= 5 (Peringatan Menipis) dan ketika stok mencapai 0 (Habis/Sold Out) agar kasir tidak panik kecolongan barang kosong.
+
+### 7. 🎨 Revamp Template Laporan (Export PDF & Excel)
+- **Bug Fix:** Memperbaiki nomor struk yang sebelumnya kosong, sekarang tersinkronisasi menggunakan format `ORD-0000` dari ID.
+- **Styling UI:** Menambahkan branding SajiPOS, styling header tabel, striping zebra selang-seling, dan highlight tegas untuk baris Total Pendapatan. Nilai `Rp 0` kini dibuat redup (abu-abu).
+- **Footer:** Menambahkan *timestamp* kapan dokumen di-*generate* beserta nama admin pencetak.
