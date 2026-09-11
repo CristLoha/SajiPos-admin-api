@@ -39,26 +39,21 @@
                             </div>
                             <div class="card-body">
                                 <div class="float-right mb-3">
-                                    <form method="GET" action="{{ route('discounts.index') }}" class="w-100">
-                                        <div class="row m-0 justify-content-end">
-                                            <div class="col-md-4 pl-0 mb-2">
-                                                <select name="status_filter" class="form-control" onchange="this.form.submit()">
-                                                    <option value="">Semua Status</option>
-                                                    <option value="active" {{ request('status_filter') == 'active' ? 'selected' : '' }}>Aktif</option>
-                                                    <option value="expired" {{ request('status_filter') == 'expired' ? 'selected' : '' }}>Expired</option>
-                                                    <option value="inactive" {{ request('status_filter') == 'inactive' ? 'selected' : '' }}>Non-aktif</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-6 pr-0 mb-2">
-                                                <div class="input-group">
-                                                    <input type="text" class="form-control" placeholder="Cari nama atau kode promo..." name="name" value="{{ request('name') }}">
-                                                    <div class="input-group-append">
-                                                        <button class="btn btn-primary px-3"><i class="fas fa-search"></i> Cari</button>
-                                                        @if(request('name') || request('status_filter'))
-                                                            <a href="{{ route('discounts.index') }}" class="btn btn-secondary px-3"><i class="fas fa-sync"></i> Reset</a>
-                                                        @endif
-                                                    </div>
-                                                </div>
+                                    <form method="GET" action="{{ route('discounts.index') }}" class="form-inline">
+                                        <select name="status_filter" class="form-control mr-2" onchange="this.form.submit()" style="min-width: 160px;">
+                                            <option value="">Semua Status</option>
+                                            <option value="active" {{ request('status_filter') == 'active' ? 'selected' : '' }}>Aktif</option>
+                                            <option value="expired" {{ request('status_filter') == 'expired' ? 'selected' : '' }}>Expired</option>
+                                            <option value="inactive" {{ request('status_filter') == 'inactive' ? 'selected' : '' }}>Non-aktif</option>
+                                        </select>
+                                        
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" placeholder="Cari nama atau kode promo..." name="name" value="{{ request('name') }}" style="min-width: 280px;">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-primary"><i class="fas fa-search"></i> Cari</button>
+                                                @if(request('name') || request('status_filter'))
+                                                    <a href="{{ route('discounts.index') }}" class="btn btn-danger" data-toggle="tooltip" title="Reset Pencarian"><i class="fas fa-times"></i></a>
+                                                @endif
                                             </div>
                                         </div>
                                     </form>

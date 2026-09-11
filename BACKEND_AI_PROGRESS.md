@@ -109,3 +109,5 @@
 
 ### 8. 📊 Fix Lebar Kolom Excel
 - **Styling Update:** Mengimplementasikan `WithEvents` di `OrderExport.php` untuk me-override auto-size dengan lebar kolom manual yang lebih lebar, sehingga data tanggal, no struk, dan nilai nominal tidak bertumpuk/terpotong di file XLSX.
+
+- **UI Tweaks:** Memperbaiki layout pencarian di menu Diskon yang sebelumnya berjejalan, sekarang lebih rapi, lega, dan intuitif menggunakan form-inline.
