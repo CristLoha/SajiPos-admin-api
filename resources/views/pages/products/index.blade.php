@@ -155,19 +155,18 @@
                                                         @if(auth()->user()->roles == 'admin')
                                                             <div class="d-flex justify-content-center">
                                                                 <a href="{{ route('products.edit', $product->id) }}"
-                                                                    class="btn btn-sm btn-info btn-icon mr-2">
+                                                                    class="btn btn-sm btn-info btn-icon mr-1" data-toggle="tooltip" title="Edit Produk">
                                                                     <i class="fas fa-edit"></i>
-                                                                    Edit
                                                                 </a>
                                                                 <form action="{{ route('products.destroy', $product->id) }}"
                                                                     method="POST"
-                                                                    class="delete-form"
+                                                                    class="ml-1 delete-form"
                                                                     onsubmit="return confirm('Apakah Anda yakin ingin menghapus produk ini?');">
                                                                     @csrf
                                                                     @method('DELETE')
                                                                     <button class="btn btn-sm btn-danger btn-icon"
-                                                                        type="submit">
-                                                                        <i class="fas fa-trash"></i> Hapus
+                                                                        type="submit" data-toggle="tooltip" title="Hapus Produk">
+                                                                        <i class="fas fa-trash-alt"></i>
                                                                     </button>
                                                                 </form>
                                                             </div>
