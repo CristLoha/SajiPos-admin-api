@@ -1107,7 +1107,7 @@ Mengirimkan rincian keranjang belanja ke server untuk dikalkulasikan total akhir
 
 Format data sama persis dengan **POST Simpan Transaksi Baru** (hanya data order/items-nya saja).
 
-## 7. 📢 Integrasi Push Notification (FCM Broadcast)
+## 10. 📢 Integrasi Push Notification (FCM Broadcast)
 
 Sistem backend SajiPOS secara otomatis akan melakukan _broadcast_ notifikasi promo (Campaign) setiap kali Admin membuat Campaign baru melalui panel web. Frontend (Mobile App) tidak memerlukan API khusus untuk menerima notifikasi ini, melainkan harus terhubung langsung dengan **Firebase Cloud Messaging (FCM)** menggunakan metode **Topic**.
 
@@ -1135,3 +1135,40 @@ Ketika pelanggan meng-klik notifikasi promo yang masuk, backend SajiPOS sudah me
 **3. Aksi Navigasi (Routing & Fetch Data)**
 Frontend dapat mem-parsing data payload tersebut. Jika `action` bernilai `"open_promo"`, maka Frontend bisa otomatis mengarahkan pelanggan ke layar/halaman **Detail Promo**, lalu mengambil data lengkap promo tersebut dengan melakukan request HTTP ke:
 👉 `GET /api/campaigns/{id}` _(gunakan `campaign_id` dari payload)_.
+
+---
+
+## 11. 🚨 Peringatan Stok & Manajemen Inventaris
+
+Backend SajiPOS telah dilengkapi dengan sistem manajemen inventaris otomatis yang terintegrasi dengan Firebase Cloud Messaging (FCM). Frontend (Mobile App / Perangkat Kasir) akan mendapatkan notifikasi seketika apabila ada barang yang stoknya menipis atau habis.
+
+### 🔄 Otomatisasi Pengurangan Stok
+Setiap kali ada pesanan baru yang dikirim via endpoint **POST `/orders`**, backend akan otomatis:
+1. Memotong stok produk di database sesuai jumlah (`quantity`) yang dibeli.
+2. Memeriksa sisa stok dari produk tersebut.
+
+### 📱 Menerima Notifikasi Stok (Untuk Aplikasi Kasir)
+
+Agar perangkat Kasir (atau Admin) mendapatkan peringatan stok kosong/menipis, Frontend aplikasi POS **wajib melakukan subscribe** ke topik FCM berikut saat Kasir berhasil _login_:
+
+-   **Nama Topic:** `stock_alerts`
+
+_(Contoh kode pada Flutter: `await FirebaseMessaging.instance.subscribeToTopic("stock_alerts");`)_
+
+#### ⚡ Kapan Notifikasi Dikirim?
+Backend akan memicu Job `StockLowAlertJob` dan mengirimkan notifikasi _Push Notification_ jika memenuhi kondisi berikut (setelah pengurangan stok):
+1. **Peringatan Stok Menipis:** Jika sisa stok produk menjadi **<= 5**.
+2. **Peringatan Stok Habis (Sold Out):** Jika sisa stok produk mencapai **0**.
+
+#### 📦 Struktur Data Payload (Data Tersembunyi)
+Notifikasi yang dikirim akan berisi detail produk agar Frontend dapat memperbarui UI secara real-time atau menampilkan pop-up peringatan kepada Kasir:
+
+```json
+{
+    "product_id": "12",
+    "product_name": "Nasi Goreng Spesial",
+    "remaining_stock": "5",
+    "status": "low_stock",    // atau "out_of_stock" jika stok = 0
+    "action": "alert_stock"
+}
+```

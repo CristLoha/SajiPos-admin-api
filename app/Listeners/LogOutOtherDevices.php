@@ -10,7 +10,7 @@ class LogOutOtherDevices
     public function handle(Login $event)
     {
         $request = request();
-        if ($request->has('password') && $event->guard === 'web') {
+        if ($request->has('password')) {
             Auth::logoutOtherDevices($request->password);
         }
     }
