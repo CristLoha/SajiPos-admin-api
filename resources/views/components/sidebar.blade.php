@@ -53,9 +53,9 @@
             </li>
 
             @if(auth()->user()->roles == 'admin')
-            <li class="menu-header">Pengaturan</li>
+            <li class="menu-header">Sistem</li>
             <li class="{{ Request::is('settings*') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('settings.index') }}"><i class="fas fa-cog"></i><span>Toko</span></a>
+                <a class="nav-link" href="{{ route('settings.index') }}"><i class="fas fa-cog"></i><span>Pengaturan</span></a>
             </li>
             @endif
 

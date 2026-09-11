@@ -113,3 +113,5 @@
 - **UI Tweaks:** Memperbaiki layout pencarian di menu Diskon yang sebelumnya berjejalan, sekarang lebih rapi, lega, dan intuitif menggunakan form-inline.
 
 - **UI Tweaks:** Menghapus label teks pada tombol aksi (Edit/Hapus) di halaman Produk agar UI lebih ringkas (icon only) dan seragam dengan halaman lain.
+
+- **UI Tweaks:** Mengganti label menu 'Toko' di sidebar menjadi 'Pengaturan'.
