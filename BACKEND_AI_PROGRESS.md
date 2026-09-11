@@ -106,3 +106,6 @@
 - **Bug Fix:** Memperbaiki nomor struk yang sebelumnya kosong, sekarang tersinkronisasi menggunakan format `ORD-0000` dari ID.
 - **Styling UI:** Menambahkan branding SajiPOS, styling header tabel, striping zebra selang-seling, dan highlight tegas untuk baris Total Pendapatan. Nilai `Rp 0` kini dibuat redup (abu-abu).
 - **Footer:** Menambahkan *timestamp* kapan dokumen di-*generate* beserta nama admin pencetak.
+
+### 8. 📊 Fix Lebar Kolom Excel
+- **Styling Update:** Mengimplementasikan `WithEvents` di `OrderExport.php` untuk me-override auto-size dengan lebar kolom manual yang lebih lebar, sehingga data tanggal, no struk, dan nilai nominal tidak bertumpuk/terpotong di file XLSX.
