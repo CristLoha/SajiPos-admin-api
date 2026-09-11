@@ -245,7 +245,7 @@
                                         <select class="form-control" id="resetUserId" required>
                                             <option value="">-- Pilih Kasir --</option>
                                             @foreach($usersWithDevice as $u)
-                                                <option value="{{ $u->id }}">{{ $u->name }} ({{ $u->email }})</option>
+                                                <option value="{{ $u->id }}">{{ $u->name }} (Perangkat: {{ \Illuminate\Support\Str::limit($u->device_id, 20) }})</option>
                                             @endforeach
                                         </select>
                                     </div>
