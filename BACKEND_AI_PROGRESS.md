@@ -120,3 +120,5 @@
 - **Refactor:** Memindahkan fitur 'Reset Device' dari halaman Users (karena terlalu teknis) ke dalam halaman Pengaturan (Sistem). Menambahkan dropdown *select user* untuk memilih kasir yang akan di-reset.
 
 - **UI Tweaks:** Menghapus info ID Perangkat teknis dari tabel Users, dan memindahkannya ke dropdown opsi 'Reset Device' di halaman Pengaturan.
+
+- **UI Keamanan:** Memperbaiki logika UI (`@if`) di halaman Kategori, Diskon, dan Campaign. Kasir (User/Staff) sekarang benar-benar tidak bisa melihat tombol Tambah, Edit, atau Hapus (Sebelumnya tombol tetap muncul walaupun aksi di-*block* oleh backend).

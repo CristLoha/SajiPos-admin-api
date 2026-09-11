@@ -7,7 +7,7 @@
         <section class="section">
             <div class="section-header">
                 <h1>Manajemen Diskon</h1>
-                @if (in_array(auth()->user()->roles, ['admin', 'staff', 'user']))
+                @if(auth()->user()->roles == 'admin')
                     <div class="section-header-button">
                         <a href="{{ route('discounts.create') }}" class="btn btn-primary">
                             <i class="fas fa-plus mr-1"></i>Tambah Diskon
@@ -122,7 +122,7 @@
                                                         @endif
                                                     </td>
                                                     <td class="text-center">
-                                                        @if (in_array(auth()->user()->roles, ['admin', 'staff', 'user']))
+                                                        @if(auth()->user()->roles == 'admin')
                                                             <div class="d-flex justify-content-center">
                                                                 <a href="{{ route('discounts.edit', $discount->id) }}"
                                                                     class="btn btn-sm btn-info btn-icon mr-1"
