@@ -10,7 +10,8 @@ class SettingWebController extends Controller
     public function index()
     {
         $setting = Setting::first();
-        return view('pages.settings.index', compact('setting'));
+        $usersWithDevice = \App\Models\User::whereNotNull('device_id')->get();
+        return view('pages.settings.index', compact('setting', 'usersWithDevice'));
     }
 
     public function update(Request $request)

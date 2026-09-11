@@ -115,3 +115,6 @@
 - **UI Tweaks:** Menghapus label teks pada tombol aksi (Edit/Hapus) di halaman Produk agar UI lebih ringkas (icon only) dan seragam dengan halaman lain.
 
 - **UI Tweaks:** Mengganti label menu 'Toko' di sidebar menjadi 'Pengaturan'.
+
+### 9. 🔐 UX Keamanan Akses
+- **Refactor:** Memindahkan fitur 'Reset Device' dari halaman Users (karena terlalu teknis) ke dalam halaman Pengaturan (Sistem). Menambahkan dropdown *select user* untuk memilih kasir yang akan di-reset.

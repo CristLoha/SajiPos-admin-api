@@ -228,12 +228,61 @@
                         </div>
                     </div>
                 </div>
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h2 class="section-title">Keamanan & Akses Kasir</h2>
+                        <p class="section-lead">Atur perangkat login untuk tiap kasir agar bisa digunakan di HP atau tablet baru.</p>
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>Reset Device ID</h4>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted">Pilih kasir yang ingin di-reset perangkatnya. Setelah di-reset, kasir tersebut dapat login kembali dari perangkat (HP/Tablet) yang baru.</p>
+                                @if(isset($usersWithDevice) && $usersWithDevice->count() > 0)
+                                <form action="" method="POST" id="resetDeviceForm" class="d-flex align-items-center">
+                                    @csrf
+                                    <div class="form-group mb-0 mr-3" style="min-width: 300px;">
+                                        <select class="form-control" id="resetUserId" required>
+                                            <option value="">-- Pilih Kasir --</option>
+                                            @foreach($usersWithDevice as $u)
+                                                <option value="{{ $u->id }}">{{ $u->name }} ({{ $u->email }})</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <button type="button" class="btn btn-warning" onclick="confirmResetDevice()">
+                                        <i class="fas fa-mobile-alt mr-1"></i> Reset Device
+                                    </button>
+                                </form>
+                                @else
+                                <div class="alert alert-info mb-0">
+                                    <i class="fas fa-info-circle mr-1"></i> Belum ada kasir yang login / terkait dengan perangkat tertentu.
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     </div>
 @endsection
 
 @push('scripts')
+<script>
+    function confirmResetDevice() {
+        const userId = document.getElementById('resetUserId').value;
+        if (!userId) {
+            alert('Pilih kasir terlebih dahulu!');
+            return;
+        }
+
+        if (confirm('Yakin ingin mereset device untuk kasir ini? Kasir akan bisa login di HP/Tablet baru.')) {
+            const form = document.getElementById('resetDeviceForm');
+            form.action = "{{ url('users') }}/" + userId + "/reset-device";
+            form.submit();
+        }
+    }
+</script>
 <!-- Modal Pilih Alamat -->
 <div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="addressModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">

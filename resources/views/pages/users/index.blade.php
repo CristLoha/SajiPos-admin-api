@@ -176,13 +176,6 @@
                                                                         <i class="fas fa-edit"></i>
                                                                     </a>
 
-                                                                    <form action="{{ route('users.resetDevice', $user->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Reset Device ID? Kasir akan bisa login di HP baru.');">
-                                                                        @csrf
-                                                                        <button type="submit" class="btn btn-sm btn-warning btn-icon mr-1" data-toggle="tooltip" title="Reset Perangkat">
-                                                                            <i class="fas fa-mobile-alt"></i>
-                                                                        </button>
-                                                                    </form>
-
                                                                     @if (auth()->id() == $user->id)
                                                                         <button
                                                                             class="btn btn-sm btn-danger btn-icon ml-1"
