@@ -129,3 +129,5 @@
 - **Dokumentasi API:** Memperbarui `resources/docs/api.md` dengan menambahkan dokumentasi fitur *Peringatan Stok & Manajemen Inventaris* (termasuk instruksi subscribe FCM Topic `stock_alerts` dan payload JSON-nya) untuk tim Frontend Flutter.
 
 - **Fitur Baru (Katalog Sinkronisasi Otomatis):** Menambahkan `CatalogUpdateAlertJob` yang mengirim FCM ke topik `catalog_updates` setiap kali Admin menambah, mengubah, atau menghapus Produk/Kategori. Dokumentasi FCM juga sudah diupdate.
+
+- **Perbaikan Bug (Login):** Menyesuaikan pesan error di Web Dashboard (Fortify) agar menampilkan status 'Akun menunggu persetujuan' jika akun belum di-approve, bukan 'Username/Password salah'.

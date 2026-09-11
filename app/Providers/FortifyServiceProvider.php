@@ -43,6 +43,24 @@ class FortifyServiceProvider extends ServiceProvider
                 ->first();
 
             if ($user && Hash::check($request->password, $user->password)) {
+                if ($user->status_akun === 'pending_approval') {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        Fortify::username() => 'Akun Anda sedang menunggu persetujuan Admin.',
+                    ]);
+                }
+                
+                if ($user->status_akun === 'rejected') {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        Fortify::username() => 'Pendaftaran Anda ditolak. Alasan: ' . ($user->rejection_reason ?? 'Tidak ada'),
+                    ]);
+                }
+                
+                if ($user->status_akun === 'nonaktif') {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        Fortify::username() => 'Akun Anda telah dinonaktifkan.',
+                    ]);
+                }
+
                 return $user;
             }
         });
